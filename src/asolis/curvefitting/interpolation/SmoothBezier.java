@@ -35,8 +35,7 @@ package asolis.curvefitting.interpolation;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.LinkedList;
-
+import java.util.List;
 import asolis.curvefitting.CurveCreationException;
 
 public class SmoothBezier extends Interpolation {
@@ -44,10 +43,10 @@ public class SmoothBezier extends Interpolation {
 	public SmoothBezier() {
 		cP = new Point2D[0];
 		points = new ArrayList<Point2D>();
-		index = new LinkedList<Integer>();
+		index = new ArrayList<Integer>();
 	}
 
-	public SmoothBezier(ArrayList<Point2D> points, LinkedList<Integer> index) throws CurveCreationException {
+	public SmoothBezier(List<Point2D> points, List<Integer> index) throws CurveCreationException {
 		setData(points, index);
 	}
 

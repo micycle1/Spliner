@@ -37,14 +37,15 @@ import java.awt.Shape;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
 import asolis.curvefitting.CurveCreationException;
 
 public class LeastSquareLine extends Interpolation {
 
-	public LeastSquareLine(ArrayList<Point2D> pts_, LinkedList<Integer> index) throws CurveCreationException {
-		setData(pts_, index);
+	public LeastSquareLine(List<Point2D> points, List<Integer> knots) throws CurveCreationException {
+		setData(points, knots);
 	}
 
 	// Least square estimation of a ( y = ax + b)

@@ -4,8 +4,8 @@ import java.awt.Shape;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.QuadCurve2D;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import asolis.curvefitting.fitting.BezierFitting;
@@ -16,8 +16,6 @@ import asolis.curvefitting.fitting.SmoothFitting;
 import processing.core.PApplet;
 
 /**
- * https://github.com/asolis/curveFitting
- * 
  * A library for Spline interpolation
  *
  * @author MCarleton
@@ -34,8 +32,8 @@ public class Example extends PApplet {
 		}
 	}
 
-	ArrayList<Point2D> list = new ArrayList<Point2D>();
-	ArrayList<Point2D> fitted = new ArrayList<Point2D>();
+	ArrayList<Point2D> list = new ArrayList<>();
+	ArrayList<Point2D> fitted = new ArrayList<>();
 
 	@Override
 	public void settings() {
@@ -131,7 +129,7 @@ public class Example extends PApplet {
 	}
 
 //	BezierFitting bf = ;
-	ArrayList<Shape> curves = new ArrayList();
+	List<Shape> curves = new ArrayList<>();
 
 	@Override
 	public void mouseReleased() {
@@ -144,10 +142,10 @@ public class Example extends PApplet {
 		Fitting f = null;
 
 		switch (type) {
-			case 0:
+			case 1:
 				f = new BezierFitting();
 				break;
-			case 1:
+			case 0:
 				f = new LeastSquareFitting();
 				break;
 			case 2:
@@ -158,11 +156,11 @@ public class Example extends PApplet {
 				break;
 		}
 
-		if (list.size() > 0) {
+		if (!list.isEmpty()) {
 
 			typestr = f.getLabel();
 			curves = f.fitCurve(list);
-			fitted = new ArrayList<Point2D>(f.points);
+			fitted = new ArrayList<>(f.points);
 		}
 
 	}

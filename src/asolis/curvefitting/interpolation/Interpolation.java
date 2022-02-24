@@ -38,15 +38,15 @@ import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.List;
 
 import asolis.curvefitting.CurveCreationException;
 
 public abstract class Interpolation {
 
 	public Point2D[] cP;
-	ArrayList<Point2D> points; // data points
-	LinkedList<Integer> index; // index to interpolate
+	List<Point2D> points; // data points
+	List<Integer> index; // index to interpolate
 
 	// Add index to interpolation
 	public int AddIndex(int i) {
@@ -54,7 +54,7 @@ public abstract class Interpolation {
 			return -1;
 		}
 		if (this.index == null) {
-			this.index = new LinkedList<Integer>();
+			this.index = new ArrayList<Integer>();
 			this.index.add(0);
 			this.index.add(points.size() - 1);
 		}
@@ -109,8 +109,8 @@ public abstract class Interpolation {
 	 * 
 	 * @return
 	 */
-	public ArrayList<Shape> getCurves() {
-		ArrayList<Shape> s = new ArrayList<Shape>();
+	public List<Shape> getCurves() {
+		List<Shape> s = new ArrayList<>();
 
 		for (int i = 0; i < N() - 1; i++) {
 			CubicCurve2D.Double cubic = new CubicCurve2D.Double(get(i).getX(), get(i).getY(), cP[2 * i].getX(),
@@ -130,7 +130,7 @@ public abstract class Interpolation {
 	}
 
 	// Return the interpolation points
-	public ArrayList<Point2D> getKnots() {
+	public List<Point2D> getKnots() {
 		if (index != null) {
 			ArrayList<Point2D> tmp = new ArrayList<Point2D>(index.size());
 			for (int i = 0; i < index.size(); i++) {
@@ -175,7 +175,7 @@ public abstract class Interpolation {
 		return -1;
 	}
 
-	public void setData(ArrayList<Point2D> pts_, LinkedList<Integer> idx) throws CurveCreationException {
+	public void setData(List<Point2D> pts_, List<Integer> idx) throws CurveCreationException {
 		this.index = idx;
 		this.points = pts_;
 

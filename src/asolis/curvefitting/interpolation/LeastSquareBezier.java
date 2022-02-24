@@ -37,7 +37,7 @@ import java.awt.Shape;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.List;
 
 import asolis.curvefitting.CurveCreationException;
 
@@ -53,7 +53,7 @@ public class LeastSquareBezier extends Interpolation {
 //	Point2D[][]  _c1;
 //	Point2D[][]  _c2;
 
-	public LeastSquareBezier(ArrayList<Point2D> pts_, LinkedList<Integer> index) throws CurveCreationException {
+	public LeastSquareBezier(List<Point2D> pts_, List<Integer> index) throws CurveCreationException {
 
 		setData(pts_, index);
 
@@ -122,7 +122,7 @@ public class LeastSquareBezier extends Interpolation {
 			return -1;
 		}
 		if (this.index == null) {
-			this.index = new LinkedList<Integer>();
+			this.index = new ArrayList<Integer>();
 			this.index.add(0);
 			this.index.add(points.size() - 1);
 		}
@@ -147,7 +147,7 @@ public class LeastSquareBezier extends Interpolation {
 			return -1;
 		}
 		if (this.index == null) {
-			this.index = new LinkedList<Integer>();
+			this.index = new ArrayList<Integer>();
 			this.index.add(0);
 			this.index.add(points.size() - 1);
 		}
@@ -327,7 +327,7 @@ public class LeastSquareBezier extends Interpolation {
 	}
 
 	@Override
-	public void setData(ArrayList<Point2D> pts_, LinkedList<Integer> idx) throws CurveCreationException {
+	public void setData(List<Point2D> pts_, List<Integer> idx) throws CurveCreationException {
 		this.index = idx;
 		this.points = pts_;
 		dynamic = true;

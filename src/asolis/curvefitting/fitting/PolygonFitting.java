@@ -36,7 +36,7 @@ package asolis.curvefitting.fitting;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.List;
 
 import asolis.curvefitting.CurveCreationException;
 import asolis.curvefitting.interpolation.LeastSquareLine;
@@ -44,7 +44,6 @@ import asolis.curvefitting.interpolation.LeastSquareLine;
 public class PolygonFitting extends Fitting {
 
 	private boolean check() {
-
 		for (int j = 0; j < knots.size() - 1; j++) {
 			if (maxIndex(points, knots.get(j), knots.get(j + 1), curve.getLineAt(j)) != -1) {
 				return false;
@@ -54,17 +53,16 @@ public class PolygonFitting extends Fitting {
 	}
 
 	@Override
-	public ArrayList<Shape> fitCurve(ArrayList<Point2D> pts) {
+	public List<Shape> fitCurve(List<Point2D> pts) {
 		THRESHOLD = 10;
-		idxs = new LinkedList<Integer>();
-		knots = new LinkedList<Integer>();
+		idxs = new ArrayList<Integer>();
+		knots = new ArrayList<Integer>();
 		knots.add(0);
 		knots.add(pts.size() - 1);
 		points = pts;
 		try {
 			curve = new LeastSquareLine(points, knots);
 		} catch (CurveCreationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		int index = maxIndex(points, 0, points.size() - 1, curve.getLineAt(0));
@@ -74,7 +72,7 @@ public class PolygonFitting extends Fitting {
 
 		while (!idxs.isEmpty()) {
 
-			int j = curve.AddIndex(idxs.poll());
+			int j = curve.AddIndex(idxs.remove(0));
 
 			index = maxIndex(points, knots.get(j - 1), knots.get(j), curve.getLineAt(j - 1));
 			if (index != -1) {
@@ -95,7 +93,6 @@ public class PolygonFitting extends Fitting {
 
 	@Override
 	public String getLabel() {
-		// TODO Auto-generated method stub
 		return "Polygon Fitting";
 	}
 

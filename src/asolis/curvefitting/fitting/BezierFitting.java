@@ -36,7 +36,7 @@ package asolis.curvefitting.fitting;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.List;
 
 import asolis.curvefitting.CurveCreationException;
 import asolis.curvefitting.interpolation.Bezier;
@@ -44,10 +44,10 @@ import asolis.curvefitting.interpolation.Bezier;
 public class BezierFitting extends Fitting {
 
 	@Override
-	public ArrayList<Shape> fitCurve(ArrayList<Point2D> pts) {
+	public List<Shape> fitCurve(List<Point2D> pts) {
 
-		idxs = new LinkedList<Integer>();
-		knots = new LinkedList<Integer>();
+		idxs = new ArrayList<Integer>();
+		knots = new ArrayList<Integer>();
 		knots.add(0);
 		knots.add(pts.size() - 1);
 		points = pts;
@@ -62,7 +62,7 @@ public class BezierFitting extends Fitting {
 			idxs.add(index);
 		}
 		while (!idxs.isEmpty()) {
-			int j = curve.AddIndex(idxs.poll());
+			int j = curve.AddIndex(idxs.remove(0));
 
 			index = maxIndex(points, knots.get(j - 1), knots.get(j), curve.getCurveAt(j - 1));
 			if (index != -1) {
@@ -73,13 +73,12 @@ public class BezierFitting extends Fitting {
 				idxs.add(index);
 			}
 		}
-		// TODO Auto-generated method stub
+
 		return curve.getCurves();
 	}
 
 	@Override
 	public String getLabel() {
-		// TODO Auto-generated method stub
 		return "Quad + Cubic Bezier Curves";
 	}
 }

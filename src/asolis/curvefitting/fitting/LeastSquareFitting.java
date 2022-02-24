@@ -36,7 +36,7 @@ package asolis.curvefitting.fitting;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.List;
 
 import asolis.curvefitting.CurveCreationException;
 import asolis.curvefitting.interpolation.LeastSquareBezier;
@@ -49,16 +49,15 @@ public class LeastSquareFitting extends Fitting {
 	}
 
 	@Override
-	public ArrayList<Shape> fitCurve(ArrayList<Point2D> pts) {
-		idxs = new LinkedList<Integer>();
-		knots = new LinkedList<Integer>();
+	public List<Shape> fitCurve(List<Point2D> pts) {
+		idxs = new ArrayList<Integer>();
+		knots = new ArrayList<Integer>();
 		knots.add(0);
 		knots.add(pts.size() - 1);
 		points = pts;
 		try {
 			curve = new LeastSquareBezier(points, knots);
 		} catch (CurveCreationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		int index = maxIndex(points, 0, points.size() - 1, curve.getCurveAt(0));
@@ -67,8 +66,7 @@ public class LeastSquareFitting extends Fitting {
 		}
 
 		while (!idxs.isEmpty()) {
-
-			int j = curve.AddIndex(idxs.poll());
+			int j = curve.AddIndex(idxs.remove(0));
 
 			index = maxIndex(points, knots.get(j - 1), knots.get(j), curve.getCurveAt(j - 1));
 			if (index != -1) {
@@ -89,7 +87,6 @@ public class LeastSquareFitting extends Fitting {
 
 	@Override
 	public String getLabel() {
-		// TODO Auto-generated method stub
 		return "Least Square Fitting";
 	}
 

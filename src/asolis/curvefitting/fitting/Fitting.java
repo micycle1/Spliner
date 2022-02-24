@@ -38,19 +38,20 @@ import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.List;
 
 import asolis.curvefitting.NearestPoint;
 import asolis.curvefitting.interpolation.Interpolation;
 
 public abstract class Fitting {
+	
 	double THRESHOLD = 25;
 	double PIXEL_STEPS = 5;
 	public Interpolation curve;
 
-	protected LinkedList<Integer> idxs = new LinkedList<Integer>();
-	public LinkedList<Integer> knots = new LinkedList<Integer>();
-	public ArrayList<Point2D> points;
+	protected List<Integer> idxs = new ArrayList<>();
+	public List<Integer> knots = new ArrayList<>();
+	public List<Point2D> points;
 
 	private boolean check() {
 
@@ -62,11 +63,11 @@ public abstract class Fitting {
 		return true;
 	}
 
-	public abstract ArrayList<Shape> fitCurve(ArrayList<Point2D> pts);
+	public abstract List<Shape> fitCurve(List<Point2D> pts);
 
 	public abstract String getLabel();
 
-	protected int maxIndex(ArrayList<Point2D> p, int init, int end, CubicCurve2D curve) {
+	protected int maxIndex(List<Point2D> p, int init, int end, CubicCurve2D curve) {
 		int index = -1;
 		if (init > end) {
 			return index;
@@ -86,7 +87,7 @@ public abstract class Fitting {
 		return (max > THRESHOLD) ? index : -1;
 	}
 
-	protected int maxIndex(ArrayList<Point2D> p, int init, int end, Line2D line) {
+	protected int maxIndex(List<Point2D> p, int init, int end, Line2D line) {
 		int index = -1;
 		if (init > end) {
 			return index;
