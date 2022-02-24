@@ -47,30 +47,9 @@ public class LeastSquareLine extends Interpolation {
 		setData(points, knots);
 	}
 
-	// Least square estimation of a ( y = ax + b)
-	// A = (sum(y)*sum(x^2)-sum(x)sum(x*y))/ (n*sum(x^2)-sum(x)^2);
-	// B = (n*sum(x*y)-sum(x)*sum(y))/(n*sum(x^2)-sum(x)^2);
-	private PVector A(int init, int end) {
-
-		double A = sumY(init, end) * sumXSq(init, end);
-		A -= sumX(init, end) * sumXY(init, end);
-		double den = (end - init + 1) * sumXSq(init, end) - Math.pow(sumX(init, end), 2.0);
-		A /= den;
-		double B = (end - init + 1) * sumXY(init, end);
-		B -= sumX(init, end) * sumY(init, end);
-		B /= den;
-
-		return new PVector((float) A, (float) B);
-	}
-
 	@Override
 	protected void compute() {
 		// no need for approximation right now
-
-//			this.cP = new PVector[(N()-1)];
-//			for (int i = 0; i < N()-1; i ++){
-//				cP[2*i]     = A(getIndex(i),getIndex(i+1));
-//			}
 	}
 
 	@Override
@@ -92,47 +71,6 @@ public class LeastSquareLine extends Interpolation {
 		}
 		Line2D.Double line = new Line2D.Double(get(i).x, get(i).y, get(i + 1).x, get(i + 1).y);
 		return line;
-	}
-
-	private double sumX(int init, int end) {
-		int sum = 0;
-		for (int i = init; i <= end; i++) {
-			sum += points.get(i).x;
-		}
-		return sum;
-	}
-
-	private double sumXSq(int init, int end) {
-		int sum = 0;
-		for (int i = init; i <= end; i++) {
-			double pointX = points.get(i).x;
-			sum += pointX * pointX;
-		}
-		return sum;
-	}
-
-	private double sumXY(int init, int end) {
-		int sum = 0;
-		for (int i = init; i <= end; i++) {
-			sum += points.get(i).x * points.get(i).y;
-		}
-		return sum;
-	}
-
-	private double sumY(int init, int end) {
-		int sum = 0;
-		for (int i = init; i <= end; i++) {
-			sum += points.get(i).y;
-		}
-		return sum;
-	}
-
-	private double sumYSq(int init, int end) {
-		int sum = 0;
-		for (int i = init; i <= end; i++) {
-			sum += Math.pow(points.get(i).y, 2.0);
-		}
-		return sum;
 	}
 
 }

@@ -310,12 +310,10 @@ public class NearestPoint {
 		// Finally, look at distance to end point, where t = 1.0
 		double distance = pa.dist(fromPoint(c.getP2()));
 		if (distance < minDistance) {
-			minDistance = distance;
 			t = 1.0f;
 		}
 
 		// Return the point on the curve at parameter value t
-
 		pn.set(bezier(v, DEGREE, t, null, null));
 
 		return pn.dist(pa);

@@ -15,10 +15,7 @@ import processing.core.PApplet;
 import processing.core.PVector;
 
 /**
- * A library for Spline interpolation
- *
- * @author MCarleton
- *
+ * Spliner demo.
  */
 public class Example extends PApplet {
 
@@ -26,17 +23,21 @@ public class Example extends PApplet {
 		PApplet.main(Example.class);
 	}
 
-	ArrayList<PVector> list = new ArrayList<>();
-	ArrayList<PVector> fitted = new ArrayList<>();
+	List<PVector> list = new ArrayList<>();
+	List<PVector> fitted = new ArrayList<>();
+	List<Shape> curves = new ArrayList<>();
+	String fitLabel = "";
 
 	@Override
 	public void settings() {
-		size(800, 800, FX2D);
+		size(1000, 1000, FX2D);
 	}
 
 	@Override
 	public void setup() {
 		rectMode(CENTER);
+		textAlign(LEFT, TOP);
+		textSize(14);
 	}
 
 	@Override
@@ -63,12 +64,9 @@ public class Example extends PApplet {
 		strokeWeight(4);
 		fitted.forEach(point -> point(point.x, point.y));
 
-		var n = new Object() {
-			int i = 0;
-		};
-
-		curves.forEach(curve -> {
-			stroke(color(n.i * (255f / curves.size()), 100, 50));
+		int i = 0;
+		for (var curve : curves) {
+			stroke(color(i * (255f / curves.size()), 100, 50));
 			strokeWeight(10);
 			if (curve instanceof CubicCurve2D) {
 				var c = (CubicCurve2D) curve;
@@ -91,19 +89,11 @@ public class Example extends PApplet {
 				rect((float) l.getX1(), (float) l.getY1(), 3, 3);
 				noFill();
 			}
-			n.i++;
-		});
+			i++;
+		}
 
 		fill(0);
-		text(typestr, 10, 10);
-	}
-
-	public void bezier(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
-		super.bezier((float) x1, (float) y1, (float) x2, (float) y2, (float) x3, (float) y3, (float) x4, (float) y4);
-	}
-
-	public void line(double x1, double y1, double x2, double y2) {
-		super.line((float) x1, (float) y1, (float) x2, (float) y2);
+		text(fitLabel, 5, 5);
 	}
 
 	@Override
@@ -120,20 +110,13 @@ public class Example extends PApplet {
 		list.clear();
 		fitted.clear();
 	}
-
-//	BezierFitting bf = ;
-	List<Shape> curves = new ArrayList<>();
-
 	@Override
 	public void mouseReleased() {
 		fit();
 	}
 
-	String typestr = "";
-
 	void fit() {
 		Fitting f = null;
-
 		switch (type) {
 			case 1 :
 				f = new BezierFitting();
@@ -150,11 +133,18 @@ public class Example extends PApplet {
 		}
 
 		if (!list.isEmpty()) {
-
-			typestr = f.getLabel();
+			fitLabel = f.getLabel();
 			curves = f.fitCurve(list);
 			fitted = new ArrayList<>(f.points);
 		}
 
+	}
+
+	private void bezier(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
+		super.bezier((float) x1, (float) y1, (float) x2, (float) y2, (float) x3, (float) y3, (float) x4, (float) y4);
+	}
+
+	private void line(double x1, double y1, double x2, double y2) {
+		super.line((float) x1, (float) y1, (float) x2, (float) y2);
 	}
 }

@@ -45,7 +45,6 @@ public class BezierFitting extends Fitting {
 
 	@Override
 	public List<Shape> fitCurve(List<PVector> pts) {
-
 		idxs = new ArrayList<>();
 		knots = new ArrayList<>();
 		knots.add(0);

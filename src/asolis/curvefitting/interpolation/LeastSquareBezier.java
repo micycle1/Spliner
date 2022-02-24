@@ -43,75 +43,66 @@ import processing.core.PVector;
 
 public class LeastSquareBezier extends Interpolation {
 
-	boolean dynamic = true;
-//	boolean[][]  dp;
-	double[] _a1;
-	double[] _a2;
-	double[] _a12;
+	private static final boolean DYNAMIC = true;
+	double[] a1;
+	double[] a2;
+	double[] a12;
 
-//
-//	PVector[][]  _c1;
-//	PVector[][]  _c2;
 
 	public LeastSquareBezier(List<PVector> pts_, List<Integer> index) throws CurveCreationException {
-
 		setData(pts_, index);
-
 	}
 
 	private double A1(int init, int end) {
-
 		double ti = 0;
 		double A1 = 0;
-		if (dynamic) {
-			if (_a1[end - init] > 0) {
-				return _a1[end - init] * 9.0;
+		if (DYNAMIC) {
+			if (a1[end - init] > 0) {
+				return a1[end - init] * 9.0;
 			}
 		}
 		for (int i = 1; i <= (end - init); i++) {
 			ti = (double) i / (double) (end - init);
 			A1 += Math.pow(ti, 2) * Math.pow(1 - ti, 4);
 		}
-		if (dynamic) {
-			_a1[end - init] = A1;
+		if (DYNAMIC) {
+			a1[end - init] = A1;
 		}
 		return 9 * A1;
 	}
 
 	private double A12(int init, int end) {
-
 		double ti = 0;
 		double A1 = 0;
-		if (dynamic) {
-			if (_a12[end - init] > 0) {
-				return _a12[end - init] * 9.0;
+		if (DYNAMIC) {
+			if (a12[end - init] > 0) {
+				return a12[end - init] * 9.0;
 			}
 		}
 		for (int i = 1; i <= (end - init); i++) {
 			ti = (double) i / (double) (end - init);
 			A1 += Math.pow(ti, 3) * Math.pow(1 - ti, 3);
 		}
-		if (dynamic) {
-			_a12[end - init] = A1;
+		if (DYNAMIC) {
+			a12[end - init] = A1;
 		}
 		return 9 * A1;
 	}
 
 	private double A2(int init, int end) {
-
 		double ti = 0;
 		double A1 = 0;
-		if (dynamic) {
-			if (_a2[end - init] > 0) {
-				return _a2[end - init] * 9.0;
+		if (DYNAMIC) {
+			if (a2[end - init] > 0) {
+				return a2[end - init] * 9.0;
 			}
 		}
 		for (int i = 1; i <= (end - init); i++) {
 			ti = (double) i / (double) (end - init);
 			A1 += Math.pow(ti, 4) * Math.pow(1 - ti, 2);
 		}
-		if (dynamic) {
-			_a2[end - init] = A1;
+		if (DYNAMIC) {
+			a2[end - init] = A1;
 		}
 		return 9 * A1;
 	}
@@ -172,7 +163,7 @@ public class LeastSquareBezier extends Interpolation {
 	}
 
 	private PVector C1(int init, int end) {
-//		if (dynamic)
+//		if (DYNAMIC)
 //			if (_c1[init][end]!=null) return _c1[init][end];
 		PVector P0 = points.get(init);
 		PVector P3 = points.get(end);
@@ -181,7 +172,7 @@ public class LeastSquareBezier extends Interpolation {
 		float ti = 0;
 
 		for (int i = 1; i <= (end - init); i++) {
-//			if (dynamic)
+//			if (DYNAMIC)
 //				if (_c1[init][init+i]!=null) {
 //					c1x += _c1[init][init+i].x;
 //					c1y += _c1[init][init+i].y;
@@ -190,7 +181,7 @@ public class LeastSquareBezier extends Interpolation {
 			ti = (float) i / (float) (end - init);
 			c1x += 3 * ti * Math.pow(1 - ti, 2) * (points.get(init + i).x - Math.pow(1 - ti, 3) * P0.x - Math.pow(ti, 3) * P3.x);
 			c1y += 3 * ti * Math.pow(1 - ti, 2) * (points.get(init + i).y - Math.pow(1 - ti, 3) * P0.y - Math.pow(ti, 3) * P3.y);
-//			if (dynamic){
+//			if (DYNAMIC){
 //				_c1[init][init+i]=new PVector(c1x,c1y);
 //			}
 		}
@@ -203,13 +194,13 @@ public class LeastSquareBezier extends Interpolation {
 		float c1x = 0;
 		float c1y = 0;
 		float ti = 0;
-//		if (dynamic)
+//		if (DYNAMIC)
 //			if (_c2[init][end]!=null) return _c2[init][end];
 		for (int i = 1; i <= (end - init); i++) {
 			ti = (float) i / (float) (end - init);
 			c1x += 3 * Math.pow(ti, 2) * (1 - ti) * (points.get(init + i).x - Math.pow(1 - ti, 3) * P0.x - Math.pow(ti, 3) * P3.x);
 			c1y += 3 * Math.pow(ti, 2) * (1 - ti) * (points.get(init + i).y - Math.pow(1 - ti, 3) * P0.y - Math.pow(ti, 3) * P3.y);
-//			if (dynamic){
+//			if (DYNAMIC){
 //				_c2[init][init+i]=new PVector(c1x,c1y);
 //			}
 		}
@@ -218,8 +209,7 @@ public class LeastSquareBezier extends Interpolation {
 
 	@Override
 	protected void compute() {
-		// this.cP = new PVector[(N()-1)*2];
-//		if (dynamic) initialize();
+//		if (DYNAMIC) initialize();
 		for (int i = 0; i < N() - 1; i++) {
 			cP[2 * getIndex(i)] = P1(getIndex(i), getIndex(i + 1));
 			cP[2 * getIndex(i) + 1] = P2(getIndex(i), getIndex(i + 1));
@@ -322,15 +312,11 @@ public class LeastSquareBezier extends Interpolation {
 	public void setData(List<PVector> pts_, List<Integer> idx) throws CurveCreationException {
 		this.index = idx;
 		this.points = pts_;
-		dynamic = true;
-		if (dynamic) {
+		if (DYNAMIC) {
 			int size = this.points.size();
-			_a1 = new double[size];
-			_a2 = new double[size];
-			_a12 = new double[size];
-
-//				_c1 = new PVector[size][size];
-//				_c2 = new PVector[size][size];
+			a1 = new double[size];
+			a2 = new double[size];
+			a12 = new double[size];
 		}
 		if (points == null) {
 			throw new CurveCreationException("Empty point set to interpolate");

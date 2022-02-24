@@ -44,7 +44,6 @@ import processing.core.PVector;
 public class LeastSquareFitting extends Fitting {
 
 	private boolean check(int j) {
-
 		return (maxIndex(points, knots.get(j), knots.get(j + 1), curve.getCurveAt(j)) == -1);
 	}
 

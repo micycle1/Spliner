@@ -56,7 +56,6 @@ public abstract class Fitting {
 	public List<PVector> points;
 
 	private boolean check() {
-
 		for (int j = 0; j < knots.size() - 1; j++) {
 			if (maxIndex(points, knots.get(j), knots.get(j + 1), curve.getCurveAt(j)) != -1) {
 				return false;
