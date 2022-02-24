@@ -33,10 +33,11 @@
  **************************************************************************************************/
 package asolis.curvefitting.interpolation;
 
-import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.List;
+
 import asolis.curvefitting.CurveCreationException;
+import processing.core.PVector;
 
 public class Bezier extends Interpolation {
 
@@ -44,8 +45,8 @@ public class Bezier extends Interpolation {
 
 	public Bezier() {
 		cP = new PVector[0];
-		points = new ArrayList<PVector>();
-		index = new ArrayList<Integer>();
+		points = new ArrayList<>();
+		index = new ArrayList<>();
 	}
 
 	public Bezier(List<PVector> pts, List<Integer> idxs) throws CurveCreationException {
@@ -58,8 +59,7 @@ public class Bezier extends Interpolation {
 		if (n == 2) {
 			cP = new PVector[2];
 			// 3P1 = 2P0 + P3
-			cP[0] = new PVector((2 * get(0).x + get(1).x) / 3,
-					(2 * get(0).y + get(1).y) / 3);
+			cP[0] = new PVector((2 * get(0).x + get(1).x) / 3, (2 * get(0).y + get(1).y) / 3);
 
 			// P2 = 2P1 + P0
 			cP[1] = new PVector((2 * cP[0].x - get(0).x), (2 * cP[0].y - get(0).y));

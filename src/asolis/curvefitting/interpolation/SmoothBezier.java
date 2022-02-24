@@ -33,17 +33,18 @@
  **************************************************************************************************/
 package asolis.curvefitting.interpolation;
 
-import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.List;
+
 import asolis.curvefitting.CurveCreationException;
+import processing.core.PVector;
 
 public class SmoothBezier extends Interpolation {
 	// First derivative and second derivative are equals.
 	public SmoothBezier() {
 		cP = new PVector[0];
-		points = new ArrayList<PVector>();
-		index = new ArrayList<Integer>();
+		points = new ArrayList<>();
+		index = new ArrayList<>();
 	}
 
 	public SmoothBezier(List<PVector> points, List<Integer> index) throws CurveCreationException {

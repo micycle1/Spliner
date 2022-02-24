@@ -36,11 +36,11 @@ package asolis.curvefitting.interpolation;
 import java.awt.Shape;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
-import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.List;
 
 import asolis.curvefitting.CurveCreationException;
+import processing.core.PVector;
 
 public abstract class Interpolation {
 
@@ -54,7 +54,7 @@ public abstract class Interpolation {
 			return -1;
 		}
 		if (this.index == null) {
-			this.index = new ArrayList<Integer>();
+			this.index = new ArrayList<>();
 			this.index.add(0);
 			this.index.add(points.size() - 1);
 		}
@@ -96,12 +96,10 @@ public abstract class Interpolation {
 
 	public CubicCurve2D getCurveAt(int i) {
 		if (i < 0 || i >= N() - 1) {
-			throw new IndexOutOfBoundsException(
-					String.format("Interpolation Class: cannot " + "retrieve curve with index : %d", i));
+			throw new IndexOutOfBoundsException(String.format("Interpolation Class: cannot " + "retrieve curve with index : %d", i));
 		}
-		CubicCurve2D.Double cubic = new CubicCurve2D.Double(get(i).x, get(i).y, cP[2 * i].x,
-				cP[2 * i].y, cP[2 * i + 1].x, cP[2 * i + 1].y, get(i + 1).x, get(i + 1).y);
-		return cubic;
+		return new CubicCurve2D.Double(get(i).x, get(i).y, cP[2 * i].x, cP[2 * i].y, cP[2 * i + 1].x, cP[2 * i + 1].y,
+				get(i + 1).x, get(i + 1).y);
 	}
 
 	/**
@@ -113,8 +111,8 @@ public abstract class Interpolation {
 		List<Shape> s = new ArrayList<>();
 
 		for (int i = 0; i < N() - 1; i++) {
-			CubicCurve2D.Double cubic = new CubicCurve2D.Double(get(i).x, get(i).y, cP[2 * i].x,
-					cP[2 * i].y, cP[2 * i + 1].x, cP[2 * i + 1].y, get(i + 1).x, get(i + 1).y);
+			CubicCurve2D.Double cubic = new CubicCurve2D.Double(get(i).x, get(i).y, cP[2 * i].x, cP[2 * i].y, cP[2 * i + 1].x,
+					cP[2 * i + 1].y, get(i + 1).x, get(i + 1).y);
 			s.add(cubic);
 		}
 
@@ -132,7 +130,7 @@ public abstract class Interpolation {
 	// Return the interpolation points
 	public List<PVector> getKnots() {
 		if (index != null) {
-			ArrayList<PVector> tmp = new ArrayList<PVector>(index.size());
+			ArrayList<PVector> tmp = new ArrayList<>(index.size());
 			for (int i = 0; i < index.size(); i++) {
 				tmp.add(get(i));
 			}
@@ -144,8 +142,7 @@ public abstract class Interpolation {
 
 	public Line2D getLineAt(int i) {
 		if (i < 0 || i >= N() - 1) {
-			throw new IndexOutOfBoundsException(
-					String.format("Interpolation Class: cannot " + "retrieve line with index : %d", i));
+			throw new IndexOutOfBoundsException(String.format("Interpolation Class: cannot " + "retrieve line with index : %d", i));
 		}
 		Line2D.Double line = new Line2D.Double(get(i).x, get(i).y, get(i + 1).x, get(i + 1).y);
 		return line;
@@ -158,21 +155,12 @@ public abstract class Interpolation {
 
 	// Remove index from interpolation
 	public int RemoveIndex(int i) {
-		if (i < 0) {
-			return -1;
+		int idx = index.indexOf(i);
+		if (idx != -1) {
+			index.remove(idx);
+			compute();
 		}
-		if (this.index == null || this.index.size() < 3) {
-
-		} else {
-			for (int j = 0; j < index.size(); j++) {
-				if (index.get(j) == i) {
-					index.remove(j);
-					compute();
-					return j;
-				}
-			}
-		}
-		return -1;
+		return idx;
 	}
 
 	public void setData(List<PVector> pts_, List<Integer> idx) throws CurveCreationException {

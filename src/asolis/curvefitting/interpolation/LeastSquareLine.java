@@ -35,11 +35,11 @@ package asolis.curvefitting.interpolation;
 
 import java.awt.Shape;
 import java.awt.geom.Line2D;
-import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.List;
 
 import asolis.curvefitting.CurveCreationException;
+import processing.core.PVector;
 
 public class LeastSquareLine extends Interpolation {
 
@@ -75,7 +75,7 @@ public class LeastSquareLine extends Interpolation {
 
 	@Override
 	public ArrayList<Shape> getCurves() {
-		ArrayList<Shape> s = new ArrayList<Shape>();
+		ArrayList<Shape> s = new ArrayList<>();
 
 		for (int i = 0; i < N() - 1; i++) {
 			Line2D.Double line = new Line2D.Double(get(i).x, get(i).y, get(i + 1).x, get(i + 1).y);
@@ -88,8 +88,7 @@ public class LeastSquareLine extends Interpolation {
 	@Override
 	public Line2D getLineAt(int i) {
 		if (i < 0 || i >= N() - 1) {
-			throw new IndexOutOfBoundsException(
-					String.format("Interpolation Class: cannot " + "retrieve line with index : %d", i));
+			throw new IndexOutOfBoundsException(String.format("Interpolation Class: cannot " + "retrieve line with index : %d", i));
 		}
 		Line2D.Double line = new Line2D.Double(get(i).x, get(i).y, get(i + 1).x, get(i + 1).y);
 		return line;

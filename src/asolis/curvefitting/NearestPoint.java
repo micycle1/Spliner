@@ -13,6 +13,7 @@ package asolis.curvefitting;
 */
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Point2D;
+
 import processing.core.PVector;
 
 public class NearestPoint {
@@ -351,7 +352,7 @@ public class NearestPoint {
 	private static Point2D toPoint(PVector from) {
 		return new Point2D.Double(from.x, from.y);
 	}
-	
+
 	public static PVector fromPoint(Point2D from) {
 		return new PVector((float) from.getX(), (float) from.getY());
 	}

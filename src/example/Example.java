@@ -3,15 +3,16 @@ package example;
 import java.awt.Shape;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
-import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.List;
+
 import asolis.curvefitting.fitting.BezierFitting;
 import asolis.curvefitting.fitting.Fitting;
 import asolis.curvefitting.fitting.LeastSquareFitting;
 import asolis.curvefitting.fitting.PolygonFitting;
 import asolis.curvefitting.fitting.SmoothFitting;
 import processing.core.PApplet;
+import processing.core.PVector;
 
 /**
  * A library for Spline interpolation
@@ -49,18 +50,18 @@ public class Example extends PApplet {
 
 		stroke(0);
 		strokeWeight(5);
-		list.forEach(point -> point((float) point.x, (float) point.y));
+		list.forEach(point -> point(point.x, point.y));
 
 		noFill();
 		beginShape();
 		stroke(125);
 		strokeWeight(3);
-		list.forEach(point -> curveVertex((float) point.x, (float) point.y));
+		list.forEach(point -> curveVertex(point.x, point.y));
 		endShape();
 
 		stroke(color(200, 0, 0));
 		strokeWeight(4);
-		fitted.forEach(point -> point((float) point.x, (float) point.y));
+		fitted.forEach(point -> point(point.x, point.y));
 
 		var n = new Object() {
 			int i = 0;
@@ -72,8 +73,7 @@ public class Example extends PApplet {
 			if (curve instanceof CubicCurve2D) {
 				var c = (CubicCurve2D) curve;
 
-				bezier(c.getX1(), c.getY1(), c.getCtrlX1(), c.getCtrlY1(), c.getCtrlX2(), c.getCtrlY2(), c.getX2(),
-						c.getY2());
+				bezier(c.getX1(), c.getY1(), c.getCtrlX1(), c.getCtrlY1(), c.getCtrlX2(), c.getCtrlY2(), c.getX2(), c.getY2());
 				stroke(color(100, 100, 250));
 				strokeWeight(2);
 				line(c.getX1(), c.getY1(), c.getCtrlX1(), c.getCtrlY1()); // cp line
@@ -135,16 +135,16 @@ public class Example extends PApplet {
 		Fitting f = null;
 
 		switch (type) {
-			case 1:
+			case 1 :
 				f = new BezierFitting();
 				break;
-			case 0:
+			case 0 :
 				f = new LeastSquareFitting();
 				break;
-			case 2:
+			case 2 :
 				f = new PolygonFitting();
 				break;
-			case 3:
+			case 3 :
 				f = new SmoothFitting();
 				break;
 		}

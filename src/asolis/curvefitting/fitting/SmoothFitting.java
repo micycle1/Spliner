@@ -34,19 +34,19 @@
 package asolis.curvefitting.fitting;
 
 import java.awt.Shape;
-import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.List;
 
 import asolis.curvefitting.CurveCreationException;
 import asolis.curvefitting.interpolation.SmoothBezier;
+import processing.core.PVector;
 
 public class SmoothFitting extends Fitting {
 
 	@Override
 	public List<Shape> fitCurve(List<PVector> pts) {
-		idxs = new ArrayList<Integer>();
-		knots = new ArrayList<Integer>();
+		idxs = new ArrayList<>();
+		knots = new ArrayList<>();
 		knots.add(0);
 		knots.add(pts.size() - 1);
 		points = pts;

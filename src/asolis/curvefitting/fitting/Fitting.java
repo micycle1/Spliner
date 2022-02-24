@@ -46,7 +46,7 @@ import asolis.curvefitting.interpolation.Interpolation;
 import processing.core.PVector;
 
 public abstract class Fitting {
-	
+
 	double THRESHOLD = 25;
 	double PIXEL_STEPS = 5;
 	public Interpolation curve;
@@ -71,10 +71,7 @@ public abstract class Fitting {
 
 	protected int maxIndex(List<processing.core.PVector> p, int init, int end, CubicCurve2D curve) {
 		int index = -1;
-		if (init > end) {
-			return index;
-		}
-		if (end - init <= PIXEL_STEPS) {
+		if ((init > end) || (end - init <= PIXEL_STEPS)) {
 			return index;
 		}
 		double max = 0;
@@ -91,10 +88,7 @@ public abstract class Fitting {
 
 	protected int maxIndex(List<PVector> p, int init, int end, Line2D line) {
 		int index = -1;
-		if (init > end) {
-			return index;
-		}
-		if (end - init <= PIXEL_STEPS) {
+		if ((init > end) || (end - init <= PIXEL_STEPS)) {
 			return index;
 		}
 		double max = 0;

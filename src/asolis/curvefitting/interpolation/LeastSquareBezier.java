@@ -35,11 +35,11 @@ package asolis.curvefitting.interpolation;
 
 import java.awt.Shape;
 import java.awt.geom.CubicCurve2D;
-import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.List;
 
 import asolis.curvefitting.CurveCreationException;
+import processing.core.PVector;
 
 public class LeastSquareBezier extends Interpolation {
 
@@ -122,7 +122,7 @@ public class LeastSquareBezier extends Interpolation {
 			return -1;
 		}
 		if (this.index == null) {
-			this.index = new ArrayList<Integer>();
+			this.index = new ArrayList<>();
 			this.index.add(0);
 			this.index.add(points.size() - 1);
 		}
@@ -147,7 +147,7 @@ public class LeastSquareBezier extends Interpolation {
 			return -1;
 		}
 		if (this.index == null) {
-			this.index = new ArrayList<Integer>();
+			this.index = new ArrayList<>();
 			this.index.add(0);
 			this.index.add(points.size() - 1);
 		}
@@ -243,7 +243,7 @@ public class LeastSquareBezier extends Interpolation {
 
 	@Override
 	public ArrayList<Shape> getCurves() {
-		ArrayList<Shape> s = new ArrayList<Shape>();
+		ArrayList<Shape> s = new ArrayList<>();
 
 		for (int i = 0; i < N() - 1; i++) {
 			CubicCurve2D.Double cubic = new CubicCurve2D.Double(get(i).x, get(i).y, cP[2 * getIndex(i)].x, cP[2 * getIndex(i)].y,
