@@ -31,72 +31,83 @@
 
  **************************************************************************************************
  **************************************************************************************************/
-package asolis.curvefitting.fitting;
+package micycle.spliner.fitting;
 
-import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.List;
 
-import asolis.curvefitting.CurveCreationException;
-import asolis.curvefitting.interpolation.LeastSquareLine;
+import micycle.spliner.NearestPoint;
+import micycle.spliner.geom.CubicCurve;
+import micycle.spliner.geom.Segment;
+import micycle.spliner.geom.Line;
+import micycle.spliner.interpolation.Interpolation;
 import processing.core.PVector;
 
-public class PolygonFitting extends Fitting {
+public abstract class Fitting {
+
+	double THRESHOLD = 25;
+	double PIXEL_STEPS = 5;
+	protected Interpolation curve;
+
+	protected List<Integer> idxs = new ArrayList<>();
+	protected List<Integer> knots = new ArrayList<>();
+	protected List<PVector> points;
 
 	private boolean check() {
 		for (int j = 0; j < knots.size() - 1; j++) {
-			if (maxIndex(points, knots.get(j), knots.get(j + 1), curve.getLineAt(j)) != -1) {
+			if (maxIndex(points, knots.get(j), knots.get(j + 1), curve.getCurveAt(j)) != -1) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	@Override
-	public List<Shape> fitCurve(List<PVector> pts) {
-		THRESHOLD = 10;
-		idxs = new ArrayList<>();
-		knots = new ArrayList<>();
-		knots.add(0);
-		knots.add(pts.size() - 1);
-		points = pts;
-		try {
-			curve = new LeastSquareLine(points, knots);
-		} catch (CurveCreationException e) {
-			e.printStackTrace();
+	/**
+	 * Computes a collection of lines that fit the list of points.
+	 * 
+	 * @param pts the list points to fit a curve to
+	 * @return a list of lines; PolygonFitting returns
+	 *         {@link micycle.spliner.geom.Segment Segments}; all other fittings
+	 *         return {@link micycle.spliner.geom.CubicCurve CubicCurves}.
+	 */
+	public abstract List<Line> fitCurve(List<PVector> pts);
+
+	public abstract String getLabel();
+
+	protected int maxIndex(List<PVector> p, int init, int end, CubicCurve curve) {
+		int index = -1;
+		if ((init > end) || (end - init <= PIXEL_STEPS)) {
+			return index;
 		}
-		int index = maxIndex(points, 0, points.size() - 1, curve.getLineAt(0));
-		if (index != -1) {
-			idxs.add(index);
-		}
-
-		while (!idxs.isEmpty()) {
-
-			int j = curve.AddIndex(idxs.remove(0));
-
-			index = maxIndex(points, knots.get(j - 1), knots.get(j), curve.getLineAt(j - 1));
-			if (index != -1) {
-				idxs.add(index);
+		double max = 0;
+		for (int i = init + 1; i < end; i++) {
+			PVector pn = new PVector();
+			double sqDis = NearestPoint.onCurve(curve, p.get(i), pn);
+			if (sqDis > max) {
+				max = sqDis;
+				index = i;
 			}
-
-			index = maxIndex(points, knots.get(j), knots.get(j + 1), curve.getLineAt(j));
-
-			if (index != -1) {
-				idxs.add(index);
-			}
-
 		}
-
-		removeUnnecessaryPoints();
-		return curve.getCurves();
+		return (max > THRESHOLD) ? index : -1;
 	}
 
-	@Override
-	public String getLabel() {
-		return "Polygon Fitting";
+	protected int maxIndex(List<PVector> p, int init, int end, Segment segment) {
+		int index = -1;
+		if ((init > end) || (end - init <= PIXEL_STEPS)) {
+			return index;
+		}
+		double max = 0;
+		for (int i = init + 1; i < end; i++) {
+			PVector pn = new PVector();
+			double sqDis = NearestPoint.onLine(segment.getP1(), segment.getP2(), p.get(i), pn);
+			if (sqDis > max) {
+				max = sqDis;
+				index = i;
+			}
+		}
+		return (max > THRESHOLD) ? index : -1;
 	}
 
-	@Override
 	protected void removeUnnecessaryPoints() {
 		int index = 0;
 		for (int j = 1; j < knots.size() - 1; j++) {

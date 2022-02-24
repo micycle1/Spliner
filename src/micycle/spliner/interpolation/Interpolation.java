@@ -31,15 +31,15 @@
 
  **************************************************************************************************
  **************************************************************************************************/
-package asolis.curvefitting.interpolation;
+package micycle.spliner.interpolation;
 
-import java.awt.Shape;
-import java.awt.geom.CubicCurve2D;
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import asolis.curvefitting.CurveCreationException;
+import micycle.spliner.CurveCreationException;
+import micycle.spliner.geom.CubicCurve;
+import micycle.spliner.geom.Segment;
+import micycle.spliner.geom.Line;
 import processing.core.PVector;
 
 public abstract class Interpolation {
@@ -94,11 +94,11 @@ public abstract class Interpolation {
 
 	}
 
-	public CubicCurve2D getCurveAt(int i) {
+	public CubicCurve getCurveAt(int i) {
 		if (i < 0 || i >= N() - 1) {
 			throw new IndexOutOfBoundsException(String.format("Interpolation Class: cannot " + "retrieve curve with index : %d", i));
 		}
-		return new CubicCurve2D.Double(get(i).x, get(i).y, cP[2 * i].x, cP[2 * i].y, cP[2 * i + 1].x, cP[2 * i + 1].y,
+		return new CubicCurve(get(i).x, get(i).y, cP[2 * i].x, cP[2 * i].y, cP[2 * i + 1].x, cP[2 * i + 1].y,
 				get(i + 1).x, get(i + 1).y);
 	}
 
@@ -107,11 +107,11 @@ public abstract class Interpolation {
 	 * 
 	 * @return
 	 */
-	public List<Shape> getCurves() {
-		List<Shape> s = new ArrayList<>();
+	public List<Line> getCurves() {
+		List<Line> s = new ArrayList<>();
 
 		for (int i = 0; i < N() - 1; i++) {
-			CubicCurve2D.Double cubic = new CubicCurve2D.Double(get(i).x, get(i).y, cP[2 * i].x, cP[2 * i].y, cP[2 * i + 1].x,
+			CubicCurve cubic = new CubicCurve(get(i).x, get(i).y, cP[2 * i].x, cP[2 * i].y, cP[2 * i + 1].x,
 					cP[2 * i + 1].y, get(i + 1).x, get(i + 1).y);
 			s.add(cubic);
 		}
@@ -140,12 +140,11 @@ public abstract class Interpolation {
 		}
 	}
 
-	public Line2D getLineAt(int i) {
+	public Segment getLineAt(int i) {
 		if (i < 0 || i >= N() - 1) {
 			throw new IndexOutOfBoundsException(String.format("Interpolation Class: cannot " + "retrieve line with index : %d", i));
 		}
-		Line2D.Double line = new Line2D.Double(get(i).x, get(i).y, get(i + 1).x, get(i + 1).y);
-		return line;
+		return new Segment(get(i).x, get(i).y, get(i + 1).x, get(i + 1).y);
 	}
 
 	// Return the number of interpolation points

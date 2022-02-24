@@ -31,83 +31,45 @@
 
  **************************************************************************************************
  **************************************************************************************************/
-package asolis.curvefitting.fitting;
+package micycle.spliner.interpolation;
 
-import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.List;
 
-import asolis.curvefitting.CurveCreationException;
-import asolis.curvefitting.interpolation.LeastSquareBezier;
+import micycle.spliner.CurveCreationException;
+import micycle.spliner.geom.Segment;
+import micycle.spliner.geom.Line;
 import processing.core.PVector;
 
-public class LeastSquareFitting extends Fitting {
+public class LeastSquareLine extends Interpolation {
 
-	private boolean check(int j) {
-		return (maxIndex(points, knots.get(j), knots.get(j + 1), curve.getCurveAt(j)) == -1);
+	public LeastSquareLine(List<PVector> points, List<Integer> knots) throws CurveCreationException {
+		setData(points, knots);
 	}
 
 	@Override
-	public List<Shape> fitCurve(List<PVector> pts) {
-		idxs = new ArrayList<>();
-		knots = new ArrayList<>();
-		knots.add(0);
-		knots.add(pts.size() - 1);
-		points = pts;
-		try {
-			curve = new LeastSquareBezier(points, knots);
-		} catch (CurveCreationException e) {
-			e.printStackTrace();
-		}
-		int index = maxIndex(points, 0, points.size() - 1, curve.getCurveAt(0));
-		if (index != -1) {
-			idxs.add(index);
-		}
-
-		while (!idxs.isEmpty()) {
-			int j = curve.AddIndex(idxs.remove(0));
-
-			index = maxIndex(points, knots.get(j - 1), knots.get(j), curve.getCurveAt(j - 1));
-			if (index != -1) {
-				idxs.add(index);
-			}
-
-			index = maxIndex(points, knots.get(j), knots.get(j + 1), curve.getCurveAt(j));
-
-			if (index != -1) {
-				idxs.add(index);
-			}
-
-		}
-
-		removeUnnecessaryPoints();
-		return curve.getCurves();
+	protected void compute() {
+		// no need for approximation right now
 	}
 
 	@Override
-	public String getLabel() {
-		return "Least Square Fitting";
+	public ArrayList<Line> getCurves() {
+		ArrayList<Line> s = new ArrayList<>();
+
+		for (int i = 0; i < N() - 1; i++) {
+			Segment segment = new Segment(get(i).x, get(i).y, get(i + 1).x, get(i + 1).y);
+			s.add(segment);
+		}
+
+		return s;
 	}
 
 	@Override
-	protected void removeUnnecessaryPoints() {
-		int index = 0;
-		for (int j = 1; j < knots.size() - 1; j++) {
-			index = knots.get(j);
-
-			PVector pj = curve.cP[2 * curve.getIndex(j)];
-			PVector pj_2 = curve.cP[2 * curve.getIndex(j) + 1];
-
-			PVector pj_1 = curve.cP[2 * curve.getIndex(j - 1)];
-			PVector pj_2_1 = curve.cP[2 * curve.getIndex(j - 1) + 1];
-
-			curve.RemoveIndex(knots.get(j));
-			if (check(j - 1)) {
-				j--;
-			} else {
-				((LeastSquareBezier) curve).AddIndex(index, pj, pj_2, pj_1, pj_2_1);
-
-			}
+	public Segment getLineAt(int i) {
+		if (i < 0 || i >= N() - 1) {
+			throw new IndexOutOfBoundsException(String.format("Interpolation Class: cannot " + "retrieve line with index : %d", i));
 		}
+		return new Segment(get(i).x, get(i).y, get(i + 1).x, get(i + 1).y);
 	}
+
 }

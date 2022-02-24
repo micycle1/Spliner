@@ -31,46 +31,72 @@
 
  **************************************************************************************************
  **************************************************************************************************/
-package asolis.curvefitting.interpolation;
+package micycle.spliner.interpolation;
 
-import java.awt.Shape;
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import asolis.curvefitting.CurveCreationException;
+import micycle.spliner.CurveCreationException;
 import processing.core.PVector;
 
-public class LeastSquareLine extends Interpolation {
+public class SmoothBezier extends Interpolation {
+	// First derivative and second derivative are equals.
+	public SmoothBezier() {
+		cP = new PVector[0];
+		points = new ArrayList<>();
+		index = new ArrayList<>();
+	}
 
-	public LeastSquareLine(List<PVector> points, List<Integer> knots) throws CurveCreationException {
-		setData(points, knots);
+	public SmoothBezier(List<PVector> points, List<Integer> index) throws CurveCreationException {
+		setData(points, index);
 	}
 
 	@Override
 	protected void compute() {
-		// no need for approximation right now
-	}
-
-	@Override
-	public ArrayList<Shape> getCurves() {
-		ArrayList<Shape> s = new ArrayList<>();
-
-		for (int i = 0; i < N() - 1; i++) {
-			Line2D.Double line = new Line2D.Double(get(i).x, get(i).y, get(i + 1).x, get(i + 1).y);
-			s.add(line);
+		int n = N() - 1;
+		if (n == 1) {
+			cP = new PVector[2];
+			// 3P1 = 2P0 + P3
+			cP[0] = new PVector((2 * get(0).x + get(1).x) / 3, (2 * get(0).y + get(1).y) / 3);
+			// P2 = 2P1 + P0
+			cP[1] = new PVector((2 * cP[0].x - get(0).x), (2 * cP[0].y - get(0).y));
+			return;
 		}
 
-		return s;
+		cP = new PVector[2 * n];
+		cP[0] = new PVector(get(0).x + 2 * get(1).x, get(0).y + 2 * get(1).y);
+		for (int i = 1; i < n - 1; ++i) {
+			cP[2 * i] = new PVector(4 * get(i).x + 2 * get(i + 1).x, 4 * get(i).y + 2 * get(i + 1).y);
+		}
+		cP[2 * (n - 1)] = new PVector((8 * get(n - 1).x + get(n).x) / 2.0f, (8 * get(n - 1).y + get(n).y) / 2.0f);
+
+		// Compute first right end points
+		getControlPoints(cP);
+		for (int i = 0; i < n; ++i) {
+			if (i < n - 1) {
+				cP[2 * i + 1] = new PVector(2 * get(i + 1).x - cP[2 * (i + 1)].x, 2 * get(i + 1).y - cP[2 * (i + 1)].y);
+			} else {
+				cP[2 * i + 1] = new PVector((get(n).x + cP[2 * (n - 1)].x) / 2, (get(n).y + cP[2 * (n - 1)].y) / 2);
+			}
+		}
+
 	}
 
-	@Override
-	public Line2D getLineAt(int i) {
-		if (i < 0 || i >= N() - 1) {
-			throw new IndexOutOfBoundsException(String.format("Interpolation Class: cannot " + "retrieve line with index : %d", i));
+	private void getControlPoints(PVector[] data) {
+		int n = data.length / 2;
+		float[] tmp = new float[n];
+		float b = 2f;
+		data[0].set(data[0].x / b, data[0].y / b);
+		for (int i = 1; i < n; i++) {
+			tmp[i] = 1 / b;
+			b = (i < n - 1 ? 4.0f : 3.5f) - tmp[i];
+			data[2 * i].set((data[2 * i].x - data[2 * (i - 1)].x) / b, (data[2 * i].y - data[2 * (i - 1)].y) / b);
 		}
-		Line2D.Double line = new Line2D.Double(get(i).x, get(i).y, get(i + 1).x, get(i + 1).y);
-		return line;
+		for (int i = 1; i < n; i++) {
+
+			data[2 * (n - i - 1)].set(data[2 * (n - i - 1)].x - tmp[n - i] * data[2 * (n - i)].x,
+					data[2 * (n - i - 1)].y - tmp[n - i] * data[2 * (n - i)].y);
+		}
 	}
 
 }

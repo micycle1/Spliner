@@ -31,86 +31,82 @@
 
  **************************************************************************************************
  **************************************************************************************************/
-package asolis.curvefitting.fitting;
+package micycle.spliner.fitting;
 
-import static asolis.curvefitting.NearestPoint.fromPoint;
-
-import java.awt.Shape;
-import java.awt.geom.CubicCurve2D;
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import asolis.curvefitting.NearestPoint;
-import asolis.curvefitting.interpolation.Interpolation;
+import micycle.spliner.CurveCreationException;
+import micycle.spliner.geom.Line;
+import micycle.spliner.interpolation.LeastSquareBezier;
 import processing.core.PVector;
 
-public abstract class Fitting {
+public class LeastSquareFitting extends Fitting {
 
-	double THRESHOLD = 25;
-	double PIXEL_STEPS = 5;
-	public Interpolation curve;
-
-	protected List<Integer> idxs = new ArrayList<>();
-	public List<Integer> knots = new ArrayList<>();
-	public List<PVector> points;
-
-	private boolean check() {
-		for (int j = 0; j < knots.size() - 1; j++) {
-			if (maxIndex(points, knots.get(j), knots.get(j + 1), curve.getCurveAt(j)) != -1) {
-				return false;
-			}
-		}
-		return true;
+	private boolean check(int j) {
+		return (maxIndex(points, knots.get(j), knots.get(j + 1), curve.getCurveAt(j)) == -1);
 	}
 
-	public abstract List<Shape> fitCurve(List<PVector> pts);
-
-	public abstract String getLabel();
-
-	protected int maxIndex(List<processing.core.PVector> p, int init, int end, CubicCurve2D curve) {
-		int index = -1;
-		if ((init > end) || (end - init <= PIXEL_STEPS)) {
-			return index;
+	@Override
+	public List<Line> fitCurve(List<PVector> pts) {
+		idxs = new ArrayList<>();
+		knots = new ArrayList<>();
+		knots.add(0);
+		knots.add(pts.size() - 1);
+		points = pts;
+		try {
+			curve = new LeastSquareBezier(points, knots);
+		} catch (CurveCreationException e) {
+			e.printStackTrace();
 		}
-		double max = 0;
-		for (int i = init + 1; i < end; i++) {
-			PVector pn = new PVector();
-			double sqDis = NearestPoint.onCurve(curve, p.get(i), pn);
-			if (sqDis > max) {
-				max = sqDis;
-				index = i;
+		int index = maxIndex(points, 0, points.size() - 1, curve.getCurveAt(0));
+		if (index != -1) {
+			idxs.add(index);
+		}
+
+		while (!idxs.isEmpty()) {
+			int j = curve.AddIndex(idxs.remove(0));
+
+			index = maxIndex(points, knots.get(j - 1), knots.get(j), curve.getCurveAt(j - 1));
+			if (index != -1) {
+				idxs.add(index);
 			}
+
+			index = maxIndex(points, knots.get(j), knots.get(j + 1), curve.getCurveAt(j));
+
+			if (index != -1) {
+				idxs.add(index);
+			}
+
 		}
-		return (max > THRESHOLD) ? index : -1;
+
+		removeUnnecessaryPoints();
+		return curve.getCurves();
 	}
 
-	protected int maxIndex(List<PVector> p, int init, int end, Line2D line) {
-		int index = -1;
-		if ((init > end) || (end - init <= PIXEL_STEPS)) {
-			return index;
-		}
-		double max = 0;
-		for (int i = init + 1; i < end; i++) {
-			PVector pn = new PVector();
-			double sqDis = NearestPoint.onLine(fromPoint(line.getP1()), fromPoint(line.getP2()), p.get(i), pn);
-			if (sqDis > max) {
-				max = sqDis;
-				index = i;
-			}
-		}
-		return (max > THRESHOLD) ? index : -1;
+	@Override
+	public String getLabel() {
+		return "Least Square Fitting";
 	}
 
+	@Override
 	protected void removeUnnecessaryPoints() {
 		int index = 0;
 		for (int j = 1; j < knots.size() - 1; j++) {
 			index = knots.get(j);
+
+			PVector pj = curve.cP[2 * curve.getIndex(j)];
+			PVector pj_2 = curve.cP[2 * curve.getIndex(j) + 1];
+
+			PVector pj_1 = curve.cP[2 * curve.getIndex(j - 1)];
+			PVector pj_2_1 = curve.cP[2 * curve.getIndex(j - 1) + 1];
+
 			curve.RemoveIndex(knots.get(j));
-			if (check()) {
+			if (check(j - 1)) {
 				j--;
 			} else {
-				curve.AddIndex(index);
+				((LeastSquareBezier) curve).AddIndex(index, pj, pj_2, pj_1, pj_2_1);
+
 			}
 		}
 	}

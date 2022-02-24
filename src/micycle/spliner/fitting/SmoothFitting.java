@@ -31,27 +31,48 @@
 
  **************************************************************************************************
  **************************************************************************************************/
-package asolis.curvefitting;
+package micycle.spliner.fitting;
 
-public class CurveCreationException extends Exception {
+import java.util.ArrayList;
+import java.util.List;
 
-	public CurveCreationException() {
-		// TODO Auto-generated constructor stub
+import micycle.spliner.CurveCreationException;
+import micycle.spliner.geom.Line;
+import micycle.spliner.interpolation.SmoothBezier;
+import processing.core.PVector;
+
+public class SmoothFitting extends Fitting {
+
+	@Override
+	public List<Line> fitCurve(List<PVector> pts) {
+		idxs = new ArrayList<>();
+		knots = new ArrayList<>();
+		knots.add(0);
+		knots.add(pts.size() - 1);
+		points = pts;
+		try {
+			curve = new SmoothBezier(points, knots);
+		} catch (CurveCreationException e) {
+			e.printStackTrace();
+		}
+		int index = maxIndex(points, 0, points.size() - 1, curve.getCurveAt(0));
+
+		while (index != -1) {
+			curve.AddIndex(index);
+			for (int i = 0; i < knots.size() - 1; i++) {
+				index = maxIndex(points, knots.get(i), knots.get(i + 1), curve.getCurveAt(i));
+				if (index != -1) {
+					break;
+				}
+			}
+		}
+
+		removeUnnecessaryPoints();
+		return curve.getCurves();
 	}
 
-	public CurveCreationException(String arg0) {
-		super(arg0);
-		// TODO Auto-generated constructor stub
+	@Override
+	public String getLabel() {
+		return "Smooth Fitting";
 	}
-
-	public CurveCreationException(String arg0, Throwable arg1) {
-		super(arg0, arg1);
-		// TODO Auto-generated constructor stub
-	}
-
-	public CurveCreationException(Throwable arg0) {
-		super(arg0);
-		// TODO Auto-generated constructor stub
-	}
-
 }

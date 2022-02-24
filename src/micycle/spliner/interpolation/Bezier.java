@@ -31,48 +31,90 @@
 
  **************************************************************************************************
  **************************************************************************************************/
-package asolis.curvefitting.fitting;
+package micycle.spliner.interpolation;
 
-import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.List;
 
-import asolis.curvefitting.CurveCreationException;
-import asolis.curvefitting.interpolation.SmoothBezier;
+import micycle.spliner.CurveCreationException;
 import processing.core.PVector;
 
-public class SmoothFitting extends Fitting {
+public class Bezier extends Interpolation {
+
+	private static final float AP = 0.5f;
+
+	public Bezier() {
+		cP = new PVector[0];
+		points = new ArrayList<>();
+		index = new ArrayList<>();
+	}
+
+	public Bezier(List<PVector> pts, List<Integer> idxs) throws CurveCreationException {
+		setData(pts, idxs);
+	}
 
 	@Override
-	public List<Shape> fitCurve(List<PVector> pts) {
-		idxs = new ArrayList<>();
-		knots = new ArrayList<>();
-		knots.add(0);
-		knots.add(pts.size() - 1);
-		points = pts;
-		try {
-			curve = new SmoothBezier(points, knots);
-		} catch (CurveCreationException e) {
-			e.printStackTrace();
-		}
-		int index = maxIndex(points, 0, points.size() - 1, curve.getCurveAt(0));
+	protected void compute() {
+		int n = N();
+		if (n == 2) {
+			cP = new PVector[2];
+			// 3P1 = 2P0 + P3
+			cP[0] = new PVector((2 * get(0).x + get(1).x) / 3, (2 * get(0).y + get(1).y) / 3);
 
-		while (index != -1) {
-			curve.AddIndex(index);
-			for (int i = 0; i < knots.size() - 1; i++) {
-				index = maxIndex(points, knots.get(i), knots.get(i + 1), curve.getCurveAt(i));
-				if (index != -1) {
-					break;
-				}
+			// P2 = 2P1 + P0
+			cP[1] = new PVector((2 * cP[0].x - get(0).x), (2 * cP[0].y - get(0).y));
+			return;
+		}
+
+		cP = new PVector[2 * n - 2];
+		double paX, paY;
+		double pbX = get(0).x;
+		double pbY = get(0).y;
+		double pcX = get(1).x;
+		double pcY = get(1).y;
+		double p2X = 0, p2Y = 0, abX, abY, acX, acY, lac, proj, apX, apY, p1X, p1Y, cbX, cbY;
+
+		for (int i = 1; i < n - 1; i++) {
+			paX = pbX;
+			paY = pbY;
+			pbX = pcX;
+			pbY = pcY;
+			pcX = get(i + 1).x;
+			pcY = get(i + 1).y;
+			abX = pbX - paX;
+			abY = pbY - paY;
+			acX = pcX - paX;
+			acY = pcY - paY;
+			lac = Math.sqrt(acX * acX + acY * acY);
+			acX = acX / lac;
+			acY = acY / lac;
+
+			proj = abX * acX + abY * acY;
+			proj = proj < 0 ? -proj : proj;
+			apX = proj * acX;
+			apY = proj * acY;
+
+			p1X = pbX - AP * apX;
+			p1Y = pbY - AP * apY;
+			if (i == 1) {
+				cP[0] = new PVector((int) p1X, (int) p1Y);
 			}
+			cP[2 * i - 1] = new PVector((int) p1X, (int) p1Y);
+
+			acX = -acX;
+			acY = -acY;
+			cbX = pbX - pcX;
+			cbY = pbY - pcY;
+			proj = cbX * acX + cbY * acY;
+			proj = proj < 0 ? -proj : proj;
+			apX = proj * acX;
+			apY = proj * acY;
+
+			p2X = pbX - AP * apX;
+			p2Y = pbY - AP * apY;
+			cP[2 * i] = new PVector((int) p2X, (int) p2Y);
 		}
-
-		removeUnnecessaryPoints();
-		return curve.getCurves();
+		cP[cP.length - 1] = new PVector((int) p2X, (int) p2Y);
 	}
 
-	@Override
-	public String getLabel() {
-		return "Smooth Fitting";
-	}
 }

@@ -31,53 +31,82 @@
 
  **************************************************************************************************
  **************************************************************************************************/
-package asolis.curvefitting.fitting;
+package micycle.spliner.fitting;
 
-import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.List;
 
-import asolis.curvefitting.CurveCreationException;
-import asolis.curvefitting.interpolation.Bezier;
+import micycle.spliner.CurveCreationException;
+import micycle.spliner.geom.Line;
+import micycle.spliner.interpolation.LeastSquareLine;
 import processing.core.PVector;
 
-public class BezierFitting extends Fitting {
+public class PolygonFitting extends Fitting {
+
+	private boolean check() {
+		for (int j = 0; j < knots.size() - 1; j++) {
+			if (maxIndex(points, knots.get(j), knots.get(j + 1), curve.getLineAt(j)) != -1) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	@Override
-	public List<Shape> fitCurve(List<PVector> pts) {
+	public List<Line> fitCurve(List<PVector> pts) {
+		THRESHOLD = 10;
 		idxs = new ArrayList<>();
 		knots = new ArrayList<>();
 		knots.add(0);
 		knots.add(pts.size() - 1);
 		points = pts;
 		try {
-			curve = new Bezier(points, knots);
+			curve = new LeastSquareLine(points, knots);
 		} catch (CurveCreationException e) {
 			e.printStackTrace();
 		}
-		// index of the point with max distance to the bezier curve
-		int index = maxIndex(points, 0, points.size() - 1, curve.getCurveAt(0));
+		int index = maxIndex(points, 0, points.size() - 1, curve.getLineAt(0));
 		if (index != -1) {
 			idxs.add(index);
 		}
+
 		while (!idxs.isEmpty()) {
+
 			int j = curve.AddIndex(idxs.remove(0));
 
-			index = maxIndex(points, knots.get(j - 1), knots.get(j), curve.getCurveAt(j - 1));
+			index = maxIndex(points, knots.get(j - 1), knots.get(j), curve.getLineAt(j - 1));
 			if (index != -1) {
 				idxs.add(index);
 			}
-			index = maxIndex(points, knots.get(j), knots.get(j + 1), curve.getCurveAt(j));
+
+			index = maxIndex(points, knots.get(j), knots.get(j + 1), curve.getLineAt(j));
+
 			if (index != -1) {
 				idxs.add(index);
 			}
+
 		}
 
+		removeUnnecessaryPoints();
 		return curve.getCurves();
 	}
 
 	@Override
 	public String getLabel() {
-		return "Quad + Cubic Bezier Curves";
+		return "Polygon Fitting";
+	}
+
+	@Override
+	protected void removeUnnecessaryPoints() {
+		int index = 0;
+		for (int j = 1; j < knots.size() - 1; j++) {
+			index = knots.get(j);
+			curve.RemoveIndex(knots.get(j));
+			if (check()) {
+				j--;
+			} else {
+				curve.AddIndex(index);
+			}
+		}
 	}
 }

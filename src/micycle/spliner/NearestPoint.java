@@ -1,27 +1,17 @@
-package asolis.curvefitting;
+package micycle.spliner;
 
-/***
- * Calculates the nearest point on a straight line or on a cubic bezier curve.
- *
- * Calculations for the Bezier parts come from:
-* "Solving the Nearest Point-on-Curve Problem" and "A Bezier Curve-Based Root-Finder"
-* by Philip J. Schneider from "Graphics Gems", Academic Press, 1990.
-*
-* @author Mark Donszelmann
-* @Modified: Andres Solis Montero. (Fixed Problem with JavaNullPointerExceptions when computing closest point on Curve).
-* @version $Id: NearestPoint.java 258 2004-06-08 06:27:49Z duns $
-*/
-import java.awt.geom.CubicCurve2D;
-import java.awt.geom.Point2D;
-
+import micycle.spliner.geom.CubicCurve;
 import processing.core.PVector;
 
 public class NearestPoint {
 
-	private static final int MAXDEPTH = 64; // Maximum depth for recursion
-	private static final double EPSILON = 1.0 * Math.pow(2, -MAXDEPTH - 1); // Flatness control value
+	/** Maximum depth for recursion */
+	private static final int MAXDEPTH = 64;
+	/** Flatness control value */
+	private static final double EPSILON = 1.0 * Math.pow(2, -MAXDEPTH - 1);
 	private static final int DEGREE = 3; // Cubic Bezier curve
-	private static final int W_DEGREE = 5; // Degree of eqn to find roots of
+	/** Degree of eqn to find roots of */
+	private static final int W_DEGREE = 5;
 
 	private static final float[][] cubicZ = {
 			/* Precomputed "z" for cubics */
@@ -281,10 +271,10 @@ public class NearestPoint {
 	 * @param pn nearest point found (return param)
 	 * @return distance squared between pa and nearest point (pn)
 	 */
-	public static double onCurve(CubicCurve2D c, PVector pa, PVector pn) {
+	public static double onCurve(CubicCurve c, PVector pa, PVector pn) {
 
 		float[] tCandidate = new float[W_DEGREE]; // Possible roots
-		PVector[] v = { fromPoint(c.getP1()), fromPoint(c.getCtrlP1()), fromPoint(c.getCtrlP2()), fromPoint(c.getP2()) };
+		PVector[] v = { c.getP1(), c.getCtrlP1(), c.getCtrlP2(), c.getP2() };
 
 		// Convert problem to 5th-degree Bezier form
 		PVector[] w = convertToBezierForm(v, pa);
@@ -294,7 +284,7 @@ public class NearestPoint {
 
 		// Compare distances of P5 to all candidates, and to t=0, and t=1
 		// Check distance to beginning of curve, where t = 0
-		double minDistance = pa.dist(fromPoint(c.getP1()));
+		double minDistance = pa.dist(c.getP1());
 		float t = 0.0f;
 
 		// Find distances for candidate points
@@ -308,7 +298,7 @@ public class NearestPoint {
 		}
 
 		// Finally, look at distance to end point, where t = 1.0
-		double distance = pa.dist(fromPoint(c.getP2()));
+		double distance = pa.dist(c.getP2());
 		if (distance < minDistance) {
 			t = 1.0f;
 		}
@@ -347,15 +337,6 @@ public class NearestPoint {
 		return pn.dist(pa);
 	}
 
-	private static Point2D toPoint(PVector from) {
-		return new Point2D.Double(from.x, from.y);
-	}
-
-	public static PVector fromPoint(Point2D from) {
-		return new PVector((float) from.getX(), (float) from.getY());
-	}
-
 	private NearestPoint() {
-		// only static methods
 	}
 }

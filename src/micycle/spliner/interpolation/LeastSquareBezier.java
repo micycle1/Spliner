@@ -31,14 +31,14 @@
 
  **************************************************************************************************
  **************************************************************************************************/
-package asolis.curvefitting.interpolation;
+package micycle.spliner.interpolation;
 
-import java.awt.Shape;
-import java.awt.geom.CubicCurve2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import asolis.curvefitting.CurveCreationException;
+import micycle.spliner.CurveCreationException;
+import micycle.spliner.geom.CubicCurve;
+import micycle.spliner.geom.Line;
 import processing.core.PVector;
 
 public class LeastSquareBezier extends Interpolation {
@@ -47,7 +47,6 @@ public class LeastSquareBezier extends Interpolation {
 	double[] a1;
 	double[] a2;
 	double[] a12;
-
 
 	public LeastSquareBezier(List<PVector> pts_, List<Integer> index) throws CurveCreationException {
 		setData(pts_, index);
@@ -222,21 +221,20 @@ public class LeastSquareBezier extends Interpolation {
 	}
 
 	@Override
-	public CubicCurve2D getCurveAt(int i) {
+	public CubicCurve getCurveAt(int i) {
 		if (i < 0 || i >= N() - 1) {
 			throw new IndexOutOfBoundsException(String.format("Interpolation Class: cannot " + "retrieve curve with index : %d", i));
 		}
-		CubicCurve2D.Double cubic = new CubicCurve2D.Double(get(i).x, get(i).y, cP[2 * getIndex(i)].x, cP[2 * getIndex(i)].y,
+		return new CubicCurve(get(i).x, get(i).y, cP[2 * getIndex(i)].x, cP[2 * getIndex(i)].y,
 				cP[2 * getIndex(i) + 1].x, cP[2 * getIndex(i) + 1].y, get(i + 1).x, get(i + 1).y);
-		return cubic;
 	}
 
 	@Override
-	public ArrayList<Shape> getCurves() {
-		ArrayList<Shape> s = new ArrayList<>();
+	public ArrayList<Line> getCurves() {
+		ArrayList<Line> s = new ArrayList<>();
 
 		for (int i = 0; i < N() - 1; i++) {
-			CubicCurve2D.Double cubic = new CubicCurve2D.Double(get(i).x, get(i).y, cP[2 * getIndex(i)].x, cP[2 * getIndex(i)].y,
+			CubicCurve cubic = new CubicCurve(get(i).x, get(i).y, cP[2 * getIndex(i)].x, cP[2 * getIndex(i)].y,
 					cP[2 * getIndex(i) + 1].x, cP[2 * getIndex(i) + 1].y, get(i + 1).x, get(i + 1).y);
 			s.add(cubic);
 		}
