@@ -33,15 +33,17 @@
  **************************************************************************************************/
 package asolis.curvefitting.fitting;
 
+import static asolis.curvefitting.NearestPoint.fromPoint;
+
 import java.awt.Shape;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
 import asolis.curvefitting.NearestPoint;
 import asolis.curvefitting.interpolation.Interpolation;
+import processing.core.PVector;
 
 public abstract class Fitting {
 	
@@ -51,7 +53,7 @@ public abstract class Fitting {
 
 	protected List<Integer> idxs = new ArrayList<>();
 	public List<Integer> knots = new ArrayList<>();
-	public List<Point2D> points;
+	public List<PVector> points;
 
 	private boolean check() {
 
@@ -63,11 +65,11 @@ public abstract class Fitting {
 		return true;
 	}
 
-	public abstract List<Shape> fitCurve(List<Point2D> pts);
+	public abstract List<Shape> fitCurve(List<PVector> pts);
 
 	public abstract String getLabel();
 
-	protected int maxIndex(List<Point2D> p, int init, int end, CubicCurve2D curve) {
+	protected int maxIndex(List<processing.core.PVector> p, int init, int end, CubicCurve2D curve) {
 		int index = -1;
 		if (init > end) {
 			return index;
@@ -77,7 +79,7 @@ public abstract class Fitting {
 		}
 		double max = 0;
 		for (int i = init + 1; i < end; i++) {
-			Point2D pn = new Point2D.Double();
+			PVector pn = new PVector();
 			double sqDis = NearestPoint.onCurve(curve, p.get(i), pn);
 			if (sqDis > max) {
 				max = sqDis;
@@ -87,7 +89,7 @@ public abstract class Fitting {
 		return (max > THRESHOLD) ? index : -1;
 	}
 
-	protected int maxIndex(List<Point2D> p, int init, int end, Line2D line) {
+	protected int maxIndex(List<PVector> p, int init, int end, Line2D line) {
 		int index = -1;
 		if (init > end) {
 			return index;
@@ -97,8 +99,8 @@ public abstract class Fitting {
 		}
 		double max = 0;
 		for (int i = init + 1; i < end; i++) {
-			Point2D pn = new Point2D.Double();
-			double sqDis = NearestPoint.onLine(line.getP1(), line.getP2(), p.get(i), pn);
+			PVector pn = new PVector();
+			double sqDis = NearestPoint.onLine(fromPoint(line.getP1()), fromPoint(line.getP2()), p.get(i), pn);
 			if (sqDis > max) {
 				max = sqDis;
 				index = i;

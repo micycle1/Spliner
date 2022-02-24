@@ -3,11 +3,9 @@ package example;
 import java.awt.Shape;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
+import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
 import asolis.curvefitting.fitting.BezierFitting;
 import asolis.curvefitting.fitting.Fitting;
 import asolis.curvefitting.fitting.LeastSquareFitting;
@@ -24,16 +22,11 @@ import processing.core.PApplet;
 public class Example extends PApplet {
 
 	public static void main(String[] args) {
-
 		PApplet.main(Example.class);
-
-		for (int i = 0; i < 10; i++) {
-			new Point2D.Double(i * 50, 400 + ThreadLocalRandom.current().nextInt(-50, 50));
-		}
 	}
 
-	ArrayList<Point2D> list = new ArrayList<>();
-	ArrayList<Point2D> fitted = new ArrayList<>();
+	ArrayList<PVector> list = new ArrayList<>();
+	ArrayList<PVector> fitted = new ArrayList<>();
 
 	@Override
 	public void settings() {
@@ -50,24 +43,24 @@ public class Example extends PApplet {
 		background(255);
 		if (mousePressed) {
 			if (pmouseX != mouseX && pmouseY != mouseY) {
-				list.add(new Point2D.Double(mouseX, mouseY));
+				list.add(new PVector(mouseX, mouseY));
 			}
 		}
 
 		stroke(0);
 		strokeWeight(5);
-		list.forEach(point -> point((float) point.getX(), (float) point.getY()));
+		list.forEach(point -> point((float) point.x, (float) point.y));
 
 		noFill();
 		beginShape();
 		stroke(125);
 		strokeWeight(3);
-		list.forEach(point -> curveVertex((float) point.getX(), (float) point.getY()));
+		list.forEach(point -> curveVertex((float) point.x, (float) point.y));
 		endShape();
 
 		stroke(color(200, 0, 0));
 		strokeWeight(4);
-		fitted.forEach(point -> point((float) point.getX(), (float) point.getY()));
+		fitted.forEach(point -> point((float) point.x, (float) point.y));
 
 		var n = new Object() {
 			int i = 0;

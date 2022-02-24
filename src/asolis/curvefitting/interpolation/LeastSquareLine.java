@@ -35,8 +35,7 @@ package asolis.curvefitting.interpolation;
 
 import java.awt.Shape;
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
+import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,14 +43,14 @@ import asolis.curvefitting.CurveCreationException;
 
 public class LeastSquareLine extends Interpolation {
 
-	public LeastSquareLine(List<Point2D> points, List<Integer> knots) throws CurveCreationException {
+	public LeastSquareLine(List<PVector> points, List<Integer> knots) throws CurveCreationException {
 		setData(points, knots);
 	}
 
 	// Least square estimation of a ( y = ax + b)
 	// A = (sum(y)*sum(x^2)-sum(x)sum(x*y))/ (n*sum(x^2)-sum(x)^2);
 	// B = (n*sum(x*y)-sum(x)*sum(y))/(n*sum(x^2)-sum(x)^2);
-	private Point2D A(int init, int end) {
+	private PVector A(int init, int end) {
 
 		double A = sumY(init, end) * sumXSq(init, end);
 		A -= sumX(init, end) * sumXY(init, end);
@@ -61,14 +60,14 @@ public class LeastSquareLine extends Interpolation {
 		B -= sumX(init, end) * sumY(init, end);
 		B /= den;
 
-		return new Point2D.Double(A, B);
+		return new PVector((float) A, (float) B);
 	}
 
 	@Override
 	protected void compute() {
 		// no need for approximation right now
 
-//			this.cP = new Point2D[(N()-1)];
+//			this.cP = new PVector[(N()-1)];
 //			for (int i = 0; i < N()-1; i ++){
 //				cP[2*i]     = A(getIndex(i),getIndex(i+1));
 //			}
@@ -79,7 +78,7 @@ public class LeastSquareLine extends Interpolation {
 		ArrayList<Shape> s = new ArrayList<Shape>();
 
 		for (int i = 0; i < N() - 1; i++) {
-			Line2D.Double line = new Line2D.Double(get(i).getX(), get(i).getY(), get(i + 1).getX(), get(i + 1).getY());
+			Line2D.Double line = new Line2D.Double(get(i).x, get(i).y, get(i + 1).x, get(i + 1).y);
 			s.add(line);
 		}
 
@@ -92,14 +91,14 @@ public class LeastSquareLine extends Interpolation {
 			throw new IndexOutOfBoundsException(
 					String.format("Interpolation Class: cannot " + "retrieve line with index : %d", i));
 		}
-		Line2D.Double line = new Line2D.Double(get(i).getX(), get(i).getY(), get(i + 1).getX(), get(i + 1).getY());
+		Line2D.Double line = new Line2D.Double(get(i).x, get(i).y, get(i + 1).x, get(i + 1).y);
 		return line;
 	}
 
 	private double sumX(int init, int end) {
 		int sum = 0;
 		for (int i = init; i <= end; i++) {
-			sum += points.get(i).getX();
+			sum += points.get(i).x;
 		}
 		return sum;
 	}
@@ -107,7 +106,7 @@ public class LeastSquareLine extends Interpolation {
 	private double sumXSq(int init, int end) {
 		int sum = 0;
 		for (int i = init; i <= end; i++) {
-			double pointX = points.get(i).getX();
+			double pointX = points.get(i).x;
 			sum += pointX * pointX;
 		}
 		return sum;
@@ -116,7 +115,7 @@ public class LeastSquareLine extends Interpolation {
 	private double sumXY(int init, int end) {
 		int sum = 0;
 		for (int i = init; i <= end; i++) {
-			sum += points.get(i).getX() * points.get(i).getY();
+			sum += points.get(i).x * points.get(i).y;
 		}
 		return sum;
 	}
@@ -124,7 +123,7 @@ public class LeastSquareLine extends Interpolation {
 	private double sumY(int init, int end) {
 		int sum = 0;
 		for (int i = init; i <= end; i++) {
-			sum += points.get(i).getY();
+			sum += points.get(i).y;
 		}
 		return sum;
 	}
@@ -132,7 +131,7 @@ public class LeastSquareLine extends Interpolation {
 	private double sumYSq(int init, int end) {
 		int sum = 0;
 		for (int i = init; i <= end; i++) {
-			sum += Math.pow(points.get(i).getY(), 2.0);
+			sum += Math.pow(points.get(i).y, 2.0);
 		}
 		return sum;
 	}

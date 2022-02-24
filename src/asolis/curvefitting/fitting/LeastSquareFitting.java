@@ -34,7 +34,7 @@
 package asolis.curvefitting.fitting;
 
 import java.awt.Shape;
-import java.awt.geom.Point2D;
+import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +49,7 @@ public class LeastSquareFitting extends Fitting {
 	}
 
 	@Override
-	public List<Shape> fitCurve(List<Point2D> pts) {
+	public List<Shape> fitCurve(List<PVector> pts) {
 		idxs = new ArrayList<Integer>();
 		knots = new ArrayList<Integer>();
 		knots.add(0);
@@ -96,11 +96,11 @@ public class LeastSquareFitting extends Fitting {
 		for (int j = 1; j < knots.size() - 1; j++) {
 			index = knots.get(j);
 
-			Point2D pj = curve.cP[2 * curve.getIndex(j)];
-			Point2D pj_2 = curve.cP[2 * curve.getIndex(j) + 1];
+			PVector pj = curve.cP[2 * curve.getIndex(j)];
+			PVector pj_2 = curve.cP[2 * curve.getIndex(j) + 1];
 
-			Point2D pj_1 = curve.cP[2 * curve.getIndex(j - 1)];
-			Point2D pj_2_1 = curve.cP[2 * curve.getIndex(j - 1) + 1];
+			PVector pj_1 = curve.cP[2 * curve.getIndex(j - 1)];
+			PVector pj_2_1 = curve.cP[2 * curve.getIndex(j - 1) + 1];
 
 			curve.RemoveIndex(knots.get(j));
 			if (check(j - 1)) {

@@ -34,7 +34,7 @@
 package asolis.curvefitting.fitting;
 
 import java.awt.Shape;
-import java.awt.geom.Point2D;
+import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +53,7 @@ public class PolygonFitting extends Fitting {
 	}
 
 	@Override
-	public List<Shape> fitCurve(List<Point2D> pts) {
+	public List<Shape> fitCurve(List<PVector> pts) {
 		THRESHOLD = 10;
 		idxs = new ArrayList<Integer>();
 		knots = new ArrayList<Integer>();

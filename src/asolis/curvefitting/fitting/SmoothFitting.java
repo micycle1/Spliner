@@ -34,7 +34,7 @@
 package asolis.curvefitting.fitting;
 
 import java.awt.Shape;
-import java.awt.geom.Point2D;
+import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +44,7 @@ import asolis.curvefitting.interpolation.SmoothBezier;
 public class SmoothFitting extends Fitting {
 
 	@Override
-	public List<Shape> fitCurve(List<Point2D> pts) {
+	public List<Shape> fitCurve(List<PVector> pts) {
 		idxs = new ArrayList<Integer>();
 		knots = new ArrayList<Integer>();
 		knots.add(0);

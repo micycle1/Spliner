@@ -35,7 +35,7 @@ package asolis.curvefitting.interpolation;
 
 import java.awt.Shape;
 import java.awt.geom.CubicCurve2D;
-import java.awt.geom.Point2D;
+import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,10 +50,10 @@ public class LeastSquareBezier extends Interpolation {
 	double[] _a12;
 
 //
-//	Point2D[][]  _c1;
-//	Point2D[][]  _c2;
+//	PVector[][]  _c1;
+//	PVector[][]  _c2;
 
-	public LeastSquareBezier(List<Point2D> pts_, List<Integer> index) throws CurveCreationException {
+	public LeastSquareBezier(List<PVector> pts_, List<Integer> index) throws CurveCreationException {
 
 		setData(pts_, index);
 
@@ -142,7 +142,7 @@ public class LeastSquareBezier extends Interpolation {
 		return -1;
 	}
 
-	public int AddIndex(int i, Point2D p1, Point2D p2, Point2D p3, Point2D p4) {
+	public int AddIndex(int i, PVector p1, PVector p2, PVector p3, PVector p4) {
 		if (i < 0) {
 			return -1;
 		}
@@ -171,59 +171,54 @@ public class LeastSquareBezier extends Interpolation {
 		return -1;
 	}
 
-	private Point2D C1(int init, int end) {
+	private PVector C1(int init, int end) {
 //		if (dynamic)
 //			if (_c1[init][end]!=null) return _c1[init][end];
-		Point2D P0 = points.get(init);
-		Point2D P3 = points.get(end);
-		double c1x = 0;
-		double c1y = 0;
-		double ti = 0;
+		PVector P0 = points.get(init);
+		PVector P3 = points.get(end);
+		float c1x = 0;
+		float c1y = 0;
+		float ti = 0;
 
 		for (int i = 1; i <= (end - init); i++) {
 //			if (dynamic)
 //				if (_c1[init][init+i]!=null) {
-//					c1x += _c1[init][init+i].getX();
-//					c1y += _c1[init][init+i].getY();
+//					c1x += _c1[init][init+i].x;
+//					c1y += _c1[init][init+i].y;
 //					continue;
 //				}
-			ti = (double) i / (double) (end - init);
-			c1x += 3 * ti * Math.pow(1 - ti, 2)
-					* (points.get(init + i).getX() - Math.pow(1 - ti, 3) * P0.getX() - Math.pow(ti, 3) * P3.getX());
-			c1y += 3 * ti * Math.pow(1 - ti, 2)
-					* (points.get(init + i).getY() - Math.pow(1 - ti, 3) * P0.getY() - Math.pow(ti, 3) * P3.getY());
+			ti = (float) i / (float) (end - init);
+			c1x += 3 * ti * Math.pow(1 - ti, 2) * (points.get(init + i).x - Math.pow(1 - ti, 3) * P0.x - Math.pow(ti, 3) * P3.x);
+			c1y += 3 * ti * Math.pow(1 - ti, 2) * (points.get(init + i).y - Math.pow(1 - ti, 3) * P0.y - Math.pow(ti, 3) * P3.y);
 //			if (dynamic){
-//				_c1[init][init+i]=new Point2D.Double(c1x,c1y);
+//				_c1[init][init+i]=new PVector(c1x,c1y);
 //			}
 		}
-		return new Point2D.Double(c1x, c1y);
+		return new PVector(c1x, c1y);
 	}
 
-	private Point2D C2(int init, int end) {
-
-		Point2D P0 = points.get(init);
-		Point2D P3 = points.get(end);
-		double c1x = 0;
-		double c1y = 0;
-		double ti = 0;
+	private PVector C2(int init, int end) {
+		PVector P0 = points.get(init);
+		PVector P3 = points.get(end);
+		float c1x = 0;
+		float c1y = 0;
+		float ti = 0;
 //		if (dynamic)
 //			if (_c2[init][end]!=null) return _c2[init][end];
 		for (int i = 1; i <= (end - init); i++) {
-			ti = (double) i / (double) (end - init);
-			c1x += 3 * Math.pow(ti, 2) * (1 - ti)
-					* (points.get(init + i).getX() - Math.pow(1 - ti, 3) * P0.getX() - Math.pow(ti, 3) * P3.getX());
-			c1y += 3 * Math.pow(ti, 2) * (1 - ti)
-					* (points.get(init + i).getY() - Math.pow(1 - ti, 3) * P0.getY() - Math.pow(ti, 3) * P3.getY());
+			ti = (float) i / (float) (end - init);
+			c1x += 3 * Math.pow(ti, 2) * (1 - ti) * (points.get(init + i).x - Math.pow(1 - ti, 3) * P0.x - Math.pow(ti, 3) * P3.x);
+			c1y += 3 * Math.pow(ti, 2) * (1 - ti) * (points.get(init + i).y - Math.pow(1 - ti, 3) * P0.y - Math.pow(ti, 3) * P3.y);
 //			if (dynamic){
-//				_c2[init][init+i]=new Point2D.Double(c1x,c1y);
+//				_c2[init][init+i]=new PVector(c1x,c1y);
 //			}
 		}
-		return new Point2D.Double(c1x, c1y);
+		return new PVector(c1x, c1y);
 	}
 
 	@Override
 	protected void compute() {
-		// this.cP = new Point2D[(N()-1)*2];
+		// this.cP = new PVector[(N()-1)*2];
 //		if (dynamic) initialize();
 		for (int i = 0; i < N() - 1; i++) {
 			cP[2 * getIndex(i)] = P1(getIndex(i), getIndex(i + 1));
@@ -239,12 +234,10 @@ public class LeastSquareBezier extends Interpolation {
 	@Override
 	public CubicCurve2D getCurveAt(int i) {
 		if (i < 0 || i >= N() - 1) {
-			throw new IndexOutOfBoundsException(
-					String.format("Interpolation Class: cannot " + "retrieve curve with index : %d", i));
+			throw new IndexOutOfBoundsException(String.format("Interpolation Class: cannot " + "retrieve curve with index : %d", i));
 		}
-		CubicCurve2D.Double cubic = new CubicCurve2D.Double(get(i).getX(), get(i).getY(), cP[2 * getIndex(i)].getX(),
-				cP[2 * getIndex(i)].getY(), cP[2 * getIndex(i) + 1].getX(), cP[2 * getIndex(i) + 1].getY(),
-				get(i + 1).getX(), get(i + 1).getY());
+		CubicCurve2D.Double cubic = new CubicCurve2D.Double(get(i).x, get(i).y, cP[2 * getIndex(i)].x, cP[2 * getIndex(i)].y,
+				cP[2 * getIndex(i) + 1].x, cP[2 * getIndex(i) + 1].y, get(i + 1).x, get(i + 1).y);
 		return cubic;
 	}
 
@@ -253,9 +246,8 @@ public class LeastSquareBezier extends Interpolation {
 		ArrayList<Shape> s = new ArrayList<Shape>();
 
 		for (int i = 0; i < N() - 1; i++) {
-			CubicCurve2D.Double cubic = new CubicCurve2D.Double(get(i).getX(), get(i).getY(),
-					cP[2 * getIndex(i)].getX(), cP[2 * getIndex(i)].getY(), cP[2 * getIndex(i) + 1].getX(),
-					cP[2 * getIndex(i) + 1].getY(), get(i + 1).getX(), get(i + 1).getY());
+			CubicCurve2D.Double cubic = new CubicCurve2D.Double(get(i).x, get(i).y, cP[2 * getIndex(i)].x, cP[2 * getIndex(i)].y,
+					cP[2 * getIndex(i) + 1].x, cP[2 * getIndex(i) + 1].y, get(i + 1).x, get(i + 1).y);
 			s.add(cubic);
 		}
 
@@ -264,30 +256,30 @@ public class LeastSquareBezier extends Interpolation {
 
 	// Least square estimation of first control point
 	// P1 = (A2*C1 - A12*C2)/ (A1*A2-A12*A12);
-	private Point2D P1(int init, int end) {
+	private PVector P1(int init, int end) {
 		if (end - init == 1) {
-			return new Point2D.Double(points.get(init).getX(), points.get(init).getY());
+			return new PVector(points.get(init).x, points.get(init).y);
 		}
 		double a1 = A1(init, end);
 		double a2 = A2(init, end);
 		double a12 = A12(init, end);
 		double den = (a1 * a2 - Math.pow(a12, 2));
 		if (den == 0) {
-			return new Point2D.Double(points.get(init).getX(), points.get(init).getY());
+			return new PVector(points.get(init).x, points.get(init).y);
 		}
-		Point2D c1 = C1(init, end);
-		Point2D c2 = C2(init, end);
-		double p1x = (a2 * c1.getX() - a12 * c2.getX()) / den;
-		double p1y = (a2 * c1.getY() - a12 * c2.getY()) / den;
+		PVector c1 = C1(init, end);
+		PVector c2 = C2(init, end);
+		double p1x = (a2 * c1.x - a12 * c2.x) / den;
+		double p1y = (a2 * c1.y - a12 * c2.y) / den;
 
-		return new Point2D.Double(p1x, p1y);
+		return new PVector((float) p1x, (float) p1y);
 	}
 
 	// Least square stimation of second control point
 	// P2 = (A1*C2 - A12*C1)/ (A1*A2-A12*A12);
-	private Point2D P2(int init, int end) {
+	private PVector P2(int init, int end) {
 		if (end - init == 1) {
-			return new Point2D.Double(points.get(end).getX(), points.get(end).getY());
+			return new PVector(points.get(end).x, points.get(end).y);
 		}
 
 		double a1 = A1(init, end);
@@ -295,15 +287,15 @@ public class LeastSquareBezier extends Interpolation {
 		double a12 = A12(init, end);
 		double den = (a1 * a2 - Math.pow(a12, 2));
 		if (den == 0) {
-			return new Point2D.Double(points.get(end).getX(), points.get(end).getY());
+			return new PVector(points.get(end).x, points.get(end).y);
 		}
 
-		Point2D c1 = C1(init, end);
-		Point2D c2 = C2(init, end);
-		double p2x = (a1 * c2.getX() - a12 * c1.getX()) / den;
-		double p2y = (a1 * c2.getY() - a12 * c1.getY()) / den;
+		PVector c1 = C1(init, end);
+		PVector c2 = C2(init, end);
+		double p2x = (a1 * c2.x - a12 * c1.x) / den;
+		double p2y = (a1 * c2.y - a12 * c1.y) / den;
 
-		return new Point2D.Double(p2x, p2y);
+		return new PVector((float) p2x, (float) p2y);
 	}
 
 	// Remove index from interpolation
@@ -327,7 +319,7 @@ public class LeastSquareBezier extends Interpolation {
 	}
 
 	@Override
-	public void setData(List<Point2D> pts_, List<Integer> idx) throws CurveCreationException {
+	public void setData(List<PVector> pts_, List<Integer> idx) throws CurveCreationException {
 		this.index = idx;
 		this.points = pts_;
 		dynamic = true;
@@ -337,8 +329,8 @@ public class LeastSquareBezier extends Interpolation {
 			_a2 = new double[size];
 			_a12 = new double[size];
 
-//				_c1 = new Point2D[size][size];
-//				_c2 = new Point2D[size][size];
+//				_c1 = new PVector[size][size];
+//				_c2 = new PVector[size][size];
 		}
 		if (points == null) {
 			throw new CurveCreationException("Empty point set to interpolate");
@@ -349,7 +341,7 @@ public class LeastSquareBezier extends Interpolation {
 		if (N() < 2) {
 			throw new CurveCreationException("Two knots requiered to interpolate");
 		}
-		this.cP = new Point2D[(pts_.size() - 1) * 2];
+		this.cP = new PVector[(pts_.size() - 1) * 2];
 		compute(0);
 
 	}

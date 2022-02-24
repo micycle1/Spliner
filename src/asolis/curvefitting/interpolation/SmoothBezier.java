@@ -33,7 +33,7 @@
  **************************************************************************************************/
 package asolis.curvefitting.interpolation;
 
-import java.awt.geom.Point2D;
+import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.List;
 import asolis.curvefitting.CurveCreationException;
@@ -41,12 +41,12 @@ import asolis.curvefitting.CurveCreationException;
 public class SmoothBezier extends Interpolation {
 	// First derivative and second derivative are equals.
 	public SmoothBezier() {
-		cP = new Point2D[0];
-		points = new ArrayList<Point2D>();
+		cP = new PVector[0];
+		points = new ArrayList<PVector>();
 		index = new ArrayList<Integer>();
 	}
 
-	public SmoothBezier(List<Point2D> points, List<Integer> index) throws CurveCreationException {
+	public SmoothBezier(List<PVector> points, List<Integer> index) throws CurveCreationException {
 		setData(points, index);
 	}
 
@@ -54,53 +54,47 @@ public class SmoothBezier extends Interpolation {
 	protected void compute() {
 		int n = N() - 1;
 		if (n == 1) {
-			cP = new Point2D[2];
+			cP = new PVector[2];
 			// 3P1 = 2P0 + P3
-			cP[0] = new Point2D.Double((2 * get(0).getX() + get(1).getX()) / 3,
-					(2 * get(0).getY() + get(1).getY()) / 3);
+			cP[0] = new PVector((2 * get(0).x + get(1).x) / 3, (2 * get(0).y + get(1).y) / 3);
 			// P2 = 2P1 + P0
-			cP[1] = new Point2D.Double((2 * cP[0].getX() - get(0).getX()), (2 * cP[0].getY() - get(0).getY()));
+			cP[1] = new PVector((2 * cP[0].x - get(0).x), (2 * cP[0].y - get(0).y));
 			return;
 		}
 
-		cP = new Point2D[2 * n];
-		cP[0] = new Point2D.Double(get(0).getX() + 2 * get(1).getX(), get(0).getY() + 2 * get(1).getY());
+		cP = new PVector[2 * n];
+		cP[0] = new PVector(get(0).x + 2 * get(1).x, get(0).y + 2 * get(1).y);
 		for (int i = 1; i < n - 1; ++i) {
-			cP[2 * i] = new Point2D.Double(4 * get(i).getX() + 2 * get(i + 1).getX(),
-					4 * get(i).getY() + 2 * get(i + 1).getY());
+			cP[2 * i] = new PVector(4 * get(i).x + 2 * get(i + 1).x, 4 * get(i).y + 2 * get(i + 1).y);
 		}
-		cP[2 * (n - 1)] = new Point2D.Double((8 * get(n - 1).getX() + get(n).getX()) / 2.0,
-				(8 * get(n - 1).getY() + get(n).getY()) / 2.0);
+		cP[2 * (n - 1)] = new PVector((8 * get(n - 1).x + get(n).x) / 2.0f, (8 * get(n - 1).y + get(n).y) / 2.0f);
 
 		// Compute first right end points
 		getControlPoints(cP);
 		for (int i = 0; i < n; ++i) {
 			if (i < n - 1) {
-				cP[2 * i + 1] = new Point2D.Double(2 * get(i + 1).getX() - cP[2 * (i + 1)].getX(),
-						2 * get(i + 1).getY() - cP[2 * (i + 1)].getY());
+				cP[2 * i + 1] = new PVector(2 * get(i + 1).x - cP[2 * (i + 1)].x, 2 * get(i + 1).y - cP[2 * (i + 1)].y);
 			} else {
-				cP[2 * i + 1] = new Point2D.Double((get(n).getX() + cP[2 * (n - 1)].getX()) / 2,
-						(get(n).getY() + cP[2 * (n - 1)].getY()) / 2);
+				cP[2 * i + 1] = new PVector((get(n).x + cP[2 * (n - 1)].x) / 2, (get(n).y + cP[2 * (n - 1)].y) / 2);
 			}
 		}
 
 	}
 
-	private void getControlPoints(Point2D[] data) {
+	private void getControlPoints(PVector[] data) {
 		int n = data.length / 2;
-		double[] tmp = new double[n];
-		double b = 2.0;
-		data[0].setLocation(data[0].getX() / b, data[0].getY() / b);
+		float[] tmp = new float[n];
+		float b = 2f;
+		data[0].set(data[0].x / b, data[0].y / b);
 		for (int i = 1; i < n; i++) {
 			tmp[i] = 1 / b;
-			b = (i < n - 1 ? 4.0 : 3.5) - tmp[i];
-			data[2 * i].setLocation((data[2 * i].getX() - data[2 * (i - 1)].getX()) / b,
-					(data[2 * i].getY() - data[2 * (i - 1)].getY()) / b);
+			b = (i < n - 1 ? 4.0f : 3.5f) - tmp[i];
+			data[2 * i].set((data[2 * i].x - data[2 * (i - 1)].x) / b, (data[2 * i].y - data[2 * (i - 1)].y) / b);
 		}
 		for (int i = 1; i < n; i++) {
 
-			data[2 * (n - i - 1)].setLocation(data[2 * (n - i - 1)].getX() - tmp[n - i] * data[2 * (n - i)].getX(),
-					data[2 * (n - i - 1)].getY() - tmp[n - i] * data[2 * (n - i)].getY());
+			data[2 * (n - i - 1)].set(data[2 * (n - i - 1)].x - tmp[n - i] * data[2 * (n - i)].x,
+					data[2 * (n - i - 1)].y - tmp[n - i] * data[2 * (n - i)].y);
 		}
 	}
 
